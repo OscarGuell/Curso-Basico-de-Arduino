@@ -1,17 +1,26 @@
 
 void giro_horario(int* grid, int eje){
-  int aux[3];
+  int aux[6];
+  
   // Cara roja (0) o naranja (5).
   if(eje == 0 || eje == 5){
-    for(int c=1; c<5; c++){
+    // Guardar los valores de la primera cara en un array auxiliar.
+    for(int i=0; i<3; i++){
+      aux[i] = grid[9 + (eje==0 ? i : 8-i)];
+    }
+    // Sobreescribir la cara actual con los valores de la siguiente cara.
+    for(int c=1; c<4; c++){
       for(int i=0; i<3; i++){
-        // Guardar los valores en un array auxiliar.
-        aux[i] = grid[c*9 + (eje==0 ? i : 8-i)];
+        grid[c*9 + (eje==0 ? i : 8-i)] = grid[(c+1)*9 + (eje==0 ? i : 8-i)];
       }
-      // Asignar los valores a la siguiente cara,
-      grid[(c==4 ? 1 : c+1)*9 + (eje==0 ? i : 8-i)] = aux[i];
+    }
+    // Asignar los valores guardados a la última cara.
+    for(int i=0; i<3; i++){
+      grid[4*9 + (eje==0 ? i : 8-i)] = aux[i];
     }
   }
+
+  if(){}
 }
 
 int main(){

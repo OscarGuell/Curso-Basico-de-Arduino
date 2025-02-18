@@ -1,10 +1,10 @@
 
 void giro_horario(int* grid, int eje){
-  int aux[6];
+  int aux[3];
   
   // Cara roja (0) o naranja (5).
   if(eje == 0 || eje == 5){
-    // Guardar los valores de la primera cara en un array auxiliar.
+    // Respaldar los valores de la primera cara en un array auxiliar.
     for(int i=0; i<3; i++){
       aux[i] = grid[9 + (eje==0 ? i : 8-i)];
     }
@@ -18,6 +18,36 @@ void giro_horario(int* grid, int eje){
     for(int i=0; i<3; i++){
       grid[4*9 + (eje==0 ? i : 8-i)] = aux[i];
     }
+  // Azul (1), Blanco (2), Verde(3), Amarillo (4).
+  } else{
+    int c;
+    int p[3];
+    for(int i = 0; i<3; i++){
+      // Respaldar los valores de la cara '0' (Rojo).
+      aux[i] = grid[i];
+      // Primera ronda de traslaciones.
+      c = (eje+2)%4+1;
+      //[c*9 -> 0]
+      grid[i] = grid[ c*9 + p[i] ];
+      // [5 -> c*9]
+      grid[ c*9 + p[i] ] =  grid[ c*9 + p[i] ]
+      // Tercera ronda.
+      c = (eje%4+1);
+      // [c*9 -> 5]
+      // Última ronda, empleando los valores auxiliares.
+      // [aux -> c*9]
+      
+      if(eje==1){
+        grid[i] = grid[c*];
+      }
+
+      
+      // Rotación lateral del cubo.
+       grid[i] = grid[ ((c+2)%4+1)*9 + A ];
+       grid[ ((c+2)%4+1)*9 + A ] = grid[5*9 + B];
+       grid[5*9 + B] = grid[ (c%4+1)*9 + C ];
+      grid[ (c%4+1)*9 + C ] = aux[i];
+    }   
   }
 
   if(){}

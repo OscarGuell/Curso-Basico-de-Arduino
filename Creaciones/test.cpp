@@ -1,6 +1,7 @@
 
-void giro_horario(int* grid, int eje){
+void giro_horario(int* grid, int* p, int eje){
   int aux[3];
+  int rec;
   
   // Cara roja (0) o naranja (5).
   if(eje == 0 || eje == 5){
@@ -18,96 +19,72 @@ void giro_horario(int* grid, int eje){
     for(int i=0; i<3; i++){
       grid[4*9 + (eje==0 ? i : 8-i)] = aux[i];
     }
-  // Azul (1), Blanco (2), Verde(3), Amarillo (4).
+    
+  // Azul (1), Blanco (2), Verde(3) o Amarillo (4).
   } else{
+    
     int c;
-    int p[3];
+    // p[]: <0,C1,5,C2>.
     for(int i = 0; i<3; i++){
       // Respaldar los valores de la cara '0' (Rojo).
-      aux[i] = grid[i];
-      // Primera ronda de traslaciones.
+      aux[i] = grid[ p[(eje-1)*12 + i + 3*0] ];
+      // "C1".
       c = (eje+2)%4+1;
-      //[c*9 -> 0]
-      grid[i] = grid[ c*9 + p[i] ];
-      // [5 -> c*9]
-      grid[ c*9 + p[i] ] =  grid[ c*9 + p[i] ]
-      // Tercera ronda.
+      //[c1*9 -> 0].
+      grid[ p[(eje-1)*12 + i + 3*0] ] = grid[ c*9 + p[(eje-1)*12 + i + 3*1] ];
+      // [5 -> c1*9].
+      grid[ c*9 + p[(eje-1)*12 + ((eje==3 || eje==4) ? (2-i) : i) + 3*1] ] = grid[ 5*9 + p[(eje-1)*12 + i + 3*2] ];
+      // "C2".
       c = (eje%4+1);
-      // [c*9 -> 5]
-      // Última ronda, empleando los valores auxiliares.
+      // [c2*9 -> 5].
+      grid[ 5*9 + p[(eje-1)*12 + ((eje==1 || eje==4) ? (2-i) : i) + 3*2] ] = grid[ c*9 + p[(eje-1)*12 + i + 3*3] ];
       // [aux -> c*9]
-      
-      if(eje==1){
-        grid[i] = grid[c*];
-      }
-
-      
-      // Rotación lateral del cubo.
-       grid[i] = grid[ ((c+2)%4+1)*9 + A ];
-       grid[ ((c+2)%4+1)*9 + A ] = grid[5*9 + B];
-       grid[5*9 + B] = grid[ (c%4+1)*9 + C ];
-      grid[ (c%4+1)*9 + C ] = aux[i];
+      // Última ronda, empleando los valores auxiliares.
+      grid[ c*9 + p[(eje-1)*12 + ((eje==2 || eje==3) ? (2-i) : i) + 3*3] ] = aux[((eje==1 || eje==2) ? (2-i) : i)];
     }   
   }
 
-  if(){}
+  // Reservar el primer valor de la cara base.
+  rec = grid[eje*9];
+  // Rotar cara base.
+  for(int j=0; j<3; j++){
+    for(int i=0; i<3; i++){
+      // Intercambiar posiciones.
+      if(i==2 && j==2){
+        grid[eje*9 + i*3 + j*3] = rec;
+      } else{
+        grid[eje*9 + j*3 + (2-i)*3] = grid[eje*9 + i*3 + j*3];
+      }
+    }
+  }
 }
 
 int main(){
+  // Generar cubo rubik.
   int grid[56];
-  // Colores: Rojo (0) - Azul (1) - Blanco (2) - Verde (3) - Amarillo (4) - Naranja (5)
+  
+  // Rellenar colores: Rojo (0) - Azul (1) - Blanco (2) - Verde (3) - Amarillo (4) - Naranja (5)
   for(int c = 0; c<6; c++){
     for(int i = 0; i<9; i++){
       grid[c*9 + i] = c;
     }
   }
-  int* ptr = grid;
+
+// Lista de posiciones relativas para un giro horario.
+// <0,C1,5,C2>.
+pos[12*4]{
+    2,5,8, 2,5,8, 6,3,0, 0,3,6,  // eje == 1 (fila 0).
+    0,1,2, 2,5,8, 0,1,2, 6,3,0,  // eje == 2 (fila 1).
+    0,3,6, 8,5,2, 2,5,8, 6,3,0,  // eje == 3 (fila 2).
+    6,7,8, 8,5,2, 8,7,6, 0,3,6   // eje == 4 (fila 3).
+};
+  // Puntero a la grilla, para usar como valor de entrada.
+  int* grid_ptr = grid;
+  // Puntero al array de posiciones.
+  int* pos_ptr = pos;
+
+  int eje = 1;
+  giro_horario(grid_ptr, pos_ptr, eje);
   
   return 0;
-}
-
-
-
-
-
-
-  
-void giro_horario(int* position_grid, int eje){
-  int aux[3];
-  int p;
-  // Cara roja (0) o naranja (5).
-  if(eje == 0 || eje == 5){
-    for(c=1; c<5; c++){
-      for(int i=0; i<3; i++){
-        aux[i] = (*position)[c*9+(eje==0 ? i : 8-i)];
-        (*position)[(c==4 ? 1 : c+1)*9+(eje==0 ? i : 8-i)] = aux[i];
-      }
-    }
-    
-  // Otros colores (1-4).
-  } else{
-    int suc[] = {5, (eje>2 ? abs(2-eje) : eje+2), 0, eje};
-    for(int c = 0; c<4; c++){
-      for(int i = 0; i<3; i++){
-        aux[i] = (*position)[suc[c]*9+i];
-      }
-    }
-  }
-}
-
-void giro_horario(int* position_grid, int eje){
-  int aux[3], p;
-  if(eje == 0 || eje == 5){
-    for(int c=1; c<5; c++){
-      for(int i=0; i<3; i++){
-        aux[i] = (*position)[c*8 + (eje==0 ? i : 8-i)];
-        (*position)[(c<4 ? c+1 : 1)*8 + (eje==0 ? i : 7-i)] = aux[i];
-      }
-    }
-  } else{
-    int suc[] = {5, (eje>2 ? abs(3-eje) : eje+2), 0};
-    for(int c=0; c<4; c++){
-      
-    }
-  }
 }

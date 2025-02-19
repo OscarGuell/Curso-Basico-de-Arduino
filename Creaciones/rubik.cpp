@@ -202,11 +202,7 @@ int main(int argc, char* argv[]) {
 	// Rellenar colores: Rojo (0) - Azul (1) - Blanco (2) - Verde (3) - Amarillo (4) - Naranja (5).
 	for (int c = 0; c < 6; c++) {
 		for (int i = 0; i < 9; i++) {
-			if (c == 0) {
-				grid[i] = i;
-			} else {
-				grid[c * 9 + i] = c;
-			}
+			grid[c * 9 + i] = c;
 		}
 	}
 

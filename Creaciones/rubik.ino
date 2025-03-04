@@ -1,7 +1,7 @@
 /*
  * Notación del cubo de Rubik:
  *
- * - Caras:
+ * - Caras (y colores):
  *   0: Rojo
  *   1: Azul
  *   2: Blanco
@@ -53,6 +53,20 @@ int p6 = 9;
 // Punteros recursivos.
 int *grid_ptr;
 int *pos_ptr;
+
+// Función para resolver el cubo.
+solve(int* grid, int* p){
+// Parte A: Resolver la cruz roja.
+	// Paso 1: Buscar piezas rojas en la cara Roja.
+	// En caso de encontrarlas, las envía a la cara Naranja.
+	for(int i=0; i<4; i++){
+		if( grid[1+2*i] == 0){
+			giro_horario
+		}
+	}
+	
+}
+
 
 // Función para realizar un giro horario
 void giro_horario(int* grid,  int* p, int eje) {

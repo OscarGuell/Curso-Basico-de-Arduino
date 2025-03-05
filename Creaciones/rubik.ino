@@ -41,7 +41,7 @@
  *     - Lado derecho conectado a cara Verde (3)
  */
 
-#include <cmath>
+#include <math.h>
 
 // Declaración de pines.
 int p0 = 2;
@@ -51,6 +51,7 @@ int p3 = 5;
 int p4 = 6;
 int p5 = 7;
 int p6 = 9;
+int p7 = 10;
 
 // Punteros recursivos.
 int *grid_ptr;
@@ -136,7 +137,8 @@ void giro_horario(int* grid,  int* p, int eje) {
 	}
     
   Serial.print("Giro horario. Cara ");
-  Serial.println(eje);
+  Serial.print(eje);
+  Serial.println(".");
   
 }
 
@@ -234,7 +236,8 @@ void giro_antihorario(int* grid, int* p, int eje) {
 	}
   
   Serial.print("Giro antihorario. Cara ");
-  Serial.println(eje);
+  Serial.print(eje);
+  Serial.println(".");
   
 }
 
@@ -471,6 +474,12 @@ void revision_superior(int* grid, int* pos){
 	} while(find);
 }
 
+void giro_aleatorio(int* grid, int* pos){
+  	int c = random(0,6);
+  	bool f = random(0,2);
+	selec_giro(grid, pos, c, f);
+}
+
 // Función para resolver el cubo.
 void solve(int* grid, int* pos){
 	
@@ -674,8 +683,9 @@ void setup() {
   	pinMode(p2, INPUT);
  	pinMode(p3, INPUT);
  	pinMode(p4, INPUT);
-    pinMode(p5, INPUT);
-    pinMode(p6, INPUT);
+    	pinMode(p5, INPUT);
+   	pinMode(p6, INPUT);
+	pinMode(p7, INPUT);
   
     // Inicializar la pantalla serial para visualización del usuario.
     Serial.begin(9600);
@@ -789,6 +799,18 @@ void loop() {
       solve(grid_ptr, pos_ptr);
       // Detener hasta soltar el botón.
       while( digitalRead(p6) == LOW );
+    }
+  }
+  
+  // Pulsar el botón 'p7'.
+  if( digitalRead(p7) == LOW ){
+    // Verificar que 150ms después siga pulsado.
+    delay(150);
+    if( digitalRead(p7) == LOW){
+      // Detener hasta soltar el botón.
+      while( digitalRead(p7) == LOW ){
+        giro_aleatorio(grid_ptr, pos_ptr);
+      };
     }
   }
 }

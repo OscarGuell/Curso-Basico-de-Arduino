@@ -54,20 +54,92 @@ int p6 = 9;
 int *grid_ptr;
 int *pos_ptr;
 
-void cruz_roja(int* grid, int* pos){
-	// En caso de encontrar una arista roja en la cara Roja (0), la envía a la cara Naranja (5).
-	for(int i=0; i<4; i++){
-		if( grid[2*i + 1] == 0 ){
-			// Comprobar que el envío no reemplace a otra arista roja en la cara Naranja (5).
-			if( grid[ 5*9 + (i<2 ? 4*i+1 : 4*i-5) ] == 0 ){
-				// En caso de encontrar conflicto, girar la cara Naranja (5) hasta resolverlo.
-				while( grid[ 5*9 + (i<2 ? 4*i+1 : 4*i-5) ] == 0 ){
-					giro_horario(grid, pos, 5);
+void hilera_superior_cara_lateral(int* grid, int* pos, int c){
+	// Detectar si hay una arista roja en la hilera superior de la cara 'c'.
+	if( grid[c*9 + 1] == 0 ){
+		// En caso de haber, asegura que un giro horario sobre la cara no retire una arista roja de la cara Naranja (5).
+		while( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+			giro_horario(grid, pos, 5);
+		}
+		// Giro horario en la cara donde se encontró una arista roja.
+		// La arista roja encontrada se ubicará en la posición '5' de la misma cara después del giro.
+		giro_horario(grid, pos, c);
+		// Aprovechar el espacio encontrado previamente en la cara Naranja (5) para el próximo giro antihorario.
+		giro_horario(grid, pos, 5);
+		// Se coloca la arista roja en la cara Naranja (5) mediante un giro antihorario en la siguiente cara lateral.
+		giro_antihorario(grid, pos, c%4+1);
+		// Comprobar que regresar la cara actual a su estado original no retirará una arista roja.
+		if( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+			int rec = 0;
+			while( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+				// 'rec' se utiliza para detener el ciclo 'while' en caso de que se detecten todas las aristas rojas en la cara Naranja.
+				// Para la comprobación, un máximo de tres giros es suficiente.
+				if(rec == 2){
+					break;
 				}
+				giro_horario(grid, pos, 5);
+				rec++;
 			}
-			// Colocar la arista roja en la cara Naranja (5).
-			giro_horario( grid, pos, (i<2 ? i+2 : 3*i-5) );
-			giro_horario( grid, pos, (i<2 ? i+2 : 3*i-5) );
+			if(rec < 2){
+				// Regresar la cara actual a su estado original.
+				giro_antihorario(grid, pos, c);
+			}
+		}
+	}
+}
+
+void lado_izquierdo_cara_lateral(int* grid, int* pos, int c){
+	// K: Cara lateral anterior.
+	int K = (c+2) % 4 + 1;
+	// Detectar si hay una arista roja en el lado izquierdo de la cara 'c'.
+	if( grid[c*9 + 3] == 0 ){
+		// En caso de haber, comprobar que un giro horario en la cara anterior (K) no retire una arista roja de la cara Naranja (5).
+		while( grid[ 5*9 + (K<3 ? 5-2*K : 2*K-1) ] == 0 ){
+			giro_horario(grid, pos, 5);
+		}
+		// Colocar la arista roja encontrada en la cara Naranja (5).
+		giro_horario(grid, pos, K);
+		// Comprobar si el movimiento colocó una arista roja en la cara Roja (0).
+		if( grid[ (4*K-9)*(K<3 ? -1 : 1) ] ){
+			// En caso de haberse colocado, comprobar que el envío no reemplace a otra arista roja en la cara Naranja (5).
+			while( grid[ 5*9 + (K<3 ? 5-2*K : 2*K-1) ] == 0 ){
+				// En caso de encontrar conflicto, girar la cara Naranja (5) hasta resolverlo.
+				giro_horario(grid, pos, 5);
+			}
+			// Colocar la arista "del conflicto" en la cara Naranja (5).
+			giro_horario(grid, pos, K);
+			giro_horario(grid, pos, K);
+		}
+		// Comprobar si el movimiento colocó una arista roja en la hilera superior de la cara 'K'.
+		if( grid[K*9 + 1] == 0 ){
+			hilera_superior_cara_lateral(grid, pos, K);
+		}
+		// Comprobar si el movimiento colocó una arista roja en el lado izquierdo de la cara anterior (para c>1).
+		if( grid[K*9 + 3] == 0 ){
+			// En caso de comprobarse, se envía la pieza a la cara Naranja (5).
+			lado_izquierdo_cara_lateral(grid, pos, K);
+		}
+	} 
+}
+
+void lado_derecho_cara_lateral(int* grid, int* pos, int c){
+	// F: Cara lateral siguiente.
+	int F = c % 4 + 1;
+	// Detectar si hay una arista roja al lado derecho de la cara 'c'.
+	if( grid[c*9 + 5] == 0 ){
+		// En caso de haber, comprobar que un giro antihorario en la cara siguiente (F) no retire una arista roja de la cara Naranja (5).
+		while( grid[ 5*9 + (F<3 ? 5-2*F : 2*F-1) ] == 0 ){
+			giro_horario(grid, pos, 5);
+		}
+		// Colocar la arista roja encontrada en la cara Naranja (5).
+		giro_antihorario(grid, pos, F);
+		// Comprobar si el movimiento colocó una arista roja en la hilera superior de la cara 'F'.
+		if( grid[F*9 + 1] == 0 ){
+			hilera_superior_cara_lateral(grid, pos, F);
+		}
+		// Para c=4: Comprobar si el movimiento colocó una arista roja en el lado derecho de la cara Azul (1).
+		if( c==4 && grid[14] == 0 ){
+			lado_derecho_cara_lateral(grid, pos, 1);
 		}
 	}
 }
@@ -78,77 +150,68 @@ void solve(int* grid, int* pos){
 // Parte A: Colocar la cruz roja.
 	
 	// Paso 1: Buscar aristas rojas en la cara Roja (0).
-	cruz_roja(grid, pos);
-	
-	// Paso 2: Buscar aristas rojas en la hilera superior de las caras laterales (1-4).
-	for(int c=1; c<5; c++){
-		// Detectar si hay una arista roja en la hilera superior de la cara 'c'.
-		if( grid[c*9 + 1] == 0 ){
-			// En caso de haber, asegura que un giro horario sobre la cara no retire una arista roja de la cara Naranja (5).
-			while( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+	// En caso de encontrar una arista roja en la cara Roja (0), la envía a la cara Naranja (5).
+	for(int i=0; i<4; i++){
+		if( grid[2*i + 1] == 0 ){
+			// Comprobar que el envío no reemplace a otra arista roja en la cara Naranja (5).
+			while( grid[ 5*9 + (i<2 ? 4*i+1 : 4*i-5) ] == 0 ){
+				// En caso de encontrar conflicto, girar la cara Naranja (5) hasta resolverlo.
 				giro_horario(grid, pos, 5);
 			}
-			// Giro horario en la cara donde se encontró una arista roja.
-			// La arista roja encontrada se ubicará en la posición '5' de la misma cara después del giro.
-			giro_horario(grid, pos, c);
-			// Aprovechar el espacio encontrado previamente en la cara Naranja (5) para el próximo giro antihorario.
-			giro_horario(grid, pos, 5);
-			// Se coloca la arista roja en la cara Naranja (5) mediante un giro antihorario en la siguiente cara lateral.
-			giro_antihorario(grid, pos, c%4+1);
-			// Comprobar que regresar la cara actual a su estado original no retirará una arista roja.
-			if( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
-				int rec = 0;
-				while( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
-					// 'rec' se utiliza para detener el ciclo 'while' en caso de que se detecten todas las aristas rojas en la cara Naranja.
-					// Para la comprobación, un máximo de tres giros es suficiente.
-					if(rec == 2){
-						break;
-					}
-					giro_horario(grid, pos, 5);
-					rec++;
-				}
-				if(rec < 2){
-					// Regresar la cara actual a su estado original.
-					giro_antihorario(grid, pos, c);
-				}
-			}
+			// Colocar la arista roja en la cara Naranja (5).
+			giro_horario( grid, pos, (i<2 ? i+2 : 3*i-5) );
+			giro_horario( grid, pos, (i<2 ? i+2 : 3*i-5) );
 		}
 	}
 	
-	// Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral.
+	// Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral (1-4).
 	for(int c=1; c<5; c++){
-		// K: Cara lateral anterior.
-		int K = (c+2) % 4 + 1;
-		// Detectar si hay una arista roja en el lado izquierdo de la cara 'c'.
-		if( grid[c*9 + 3] == 0 ){
-			// En caso de haber, comprobar que un giro horario en la cara anterior (K) no retire una arista roja de la cara Naranja (5).
-			if( grid[ 5*9 + (K<3 ? 5-2*K : 2*K-1) ] == 0 ){
-				while( grid[ 5*9 + (K<3 ? 5-2*K : 2*K-1) ] == 0 ){
-					giro_horario(grid, pos, 5);
-				}
-			}
-			// Colocar la arista roja encontrada en la cara Naranja (5).
-			giro_horario(grid, pos, K);
-			// Comprobar si este movimiento colocó una arista roja en la cara Roja (0).
-			if( grid[ (4K-9)*(K<3 ? -1 : 1) ] ){
-				// En caso de encontrarla, comprobar que el envío no reemplace a otra arista roja en la cara Naranja (5).
-				if( grid[ 5*9 + (i<2 ? 4*i+1 : 4*i-5) ] == 0 ){
-					// En caso de encontrar conflicto, girar la cara Naranja (5) hasta resolverlo.
-					while( grid[ 5*9 + (i<2 ? 4*i+1 : 4*i-5) ] == 0 ){
-						giro_horario(grid, pos, 5);
-					}
-				}
-			}
-		} 
+		hilera_superior_cara_lateral(grid, pos, c);
 	}
 
-	// Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral.
+	// Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral (1-4).
 	for(int c=1; c<5; c++){
-		// Detectar si hay una arista roja al lado derecho de la cara 'c'.
-		if( grid[c*9 + 5] == 0){
-			
+		lado_izquierdo_cara_lateral(grid, pos, c);
+	}
+
+	// Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral (1-4).
+	for(int c=1; c<5; c++){
+		lado_derecho_cara_lateral(grid, pos, c);
+	}
+
+	// Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral (1-4).
+	for(int c=1; c<5; c++){
+		// Detectar si hay una arista roja en la hilera inferior de la cara 'c'.
+		if( grid[c*9 + 7] == 0 ){
+			// Algoritmo para colocar la arista roja en la cara Naranja (5) aprovechando el espacio generado por la arista encontrada.
+			giro_antihorario(grid, pos, c);
+			giro_horario(grid, pos, 5);
+			giro_antihorario(grid, pos, c % 4 + 1);
+			// Regresar la cara Naranja (5) a su posición original, para evitar problemas en la iteración.
+			giro_antihorario(grid, pos, 5);
 		}
 	}
+
+	// Paso 6: Una vez colocadas todas las aristas rojas en la cara Naranja (5), se mueven a la cara Roja (0).
+	int rep = 0;
+	// Iterar hasta haber desplazado 4 aristas.
+	while(rep < 4){
+		// Explorar las caras laterales.
+		for(int c=1; c<5; c++){
+			// Buscar aristas en la hilera inferior que coincidan con el color del centro de la cara.
+			if( grid[c*9 + 7] == c && grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+				giro_horario(grid, pos, c);
+				giro_horario(grid, pos, c);
+				rep++;
+			}
+		}
+		// Girar la cara Naranja (5) y continuar el ciclo hasta haber desplazado 4 aristas.
+		giro_horario(grid, pos, 5);
+	}
+
+// Parte B: Esquinas de la cara Roja (0).
+
+	
 }
 
 

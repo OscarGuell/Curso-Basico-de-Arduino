@@ -534,9 +534,10 @@ void solve(int* grid, int* pos){
 		}
 	}
 
-	// Paso 6: Una vez colocadas todas las aristas rojas en la cara Naranja (5), se mueven a la cara Roja (0).
-	Serial.println("Paso 6: Buscar aristas rojas en la hilera inferior de cada cara lateral.");
+	// Paso 6: Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).
+	Serial.println("Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).");
 	int rep = 0;
+	int count = 0;
 	// Iterar hasta haber desplazado 4 aristas.
 	while(rep < 4){
 		// Explorar las caras laterales.

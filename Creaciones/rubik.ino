@@ -41,6 +41,8 @@
  *     - Lado derecho conectado a cara Verde (3)
  */
 
+#include <cmath>
+
 // Declaración de pines.
 int p0 = 2;
 int p1 = 3;
@@ -144,6 +146,58 @@ void lado_derecho_cara_lateral(int* grid, int* pos, int c){
 	}
 }
 
+void esquinas_rojas_cara_naranja(int* grid, int* pos){
+	int c;
+	bool rec;
+	// Recorrer las esquinas de la cara naranja.
+	for(int i=1; i<5; i++){
+		// En caso de encontrar una esquina roja, busca alinearla en la cara lateral correcta.
+		if( grid[ 5*9 + 2*i + (i<3 ? -2 : 0) ] == 0 ){
+			rec = false;
+			c = i;
+			while(rec == false){
+				if( grid[(c%4+1)*9 + 6] == c ){
+					c = c % 4 + 1;
+					rec = true;
+				}
+				giro_horario(grid, pos, 5);
+				c = c % 4 + 1;
+			}
+			// Una vez alineada la esquina en una posición opuesta a la correcta, se ejecuta el algoritmo.
+			giro_antihorario(grid, pos, c);
+			giro_antihorario(grid, pos, 5);
+			giro_antihorario(grid, pos, 5);
+			giro_horario(grid, pos, c);
+			giro_horario(grid, pos, 5);
+			giro_antihorario(grid, pos, c);
+			giro_antihorario(grid, pos, 5);
+			giro_horario(grid, pos, c);
+		}
+	}
+}
+
+void subir_esquina_izquierda(int* grid, int* pos, int c){
+	giro_horario(grid, pos, 5);
+	giro_horario(grid, pos, (c+2)%4+1);
+	giro_antihorario(grid, pos, 5);
+	giro_antihorario(grid, pos, (c+2)%4+1);
+}
+
+void subir_esquina_derecha(int* grid, int* pos, int c){
+	giro_antihorario(grid, pos, 5);
+	giro_antihorario(grid, pos, c%4+1);
+	giro_horario(grid, pos, 5);
+	giro_horario(grid, pos, c%4+1);
+}
+
+void selec_giro(int* grid, int* pos, int c, bool state){
+	if(state == true){
+		giro_horario(grid, pos, c);
+	} else{
+		giro_antihorario(grid, pos, c);
+	}
+}
+
 // Función para resolver el cubo.
 void solve(int* grid, int* pos){
 	
@@ -211,7 +265,97 @@ void solve(int* grid, int* pos){
 
 // Parte B: Esquinas de la cara Roja (0).
 
-	
+	// Paso 1: Buscar esquinas rojas en la cara Naranja (5).
+	esquinas_rojas_cara_naranja(grid, pos);
+
+	// Paso 2: Buscar 'rojo' (0) en la esquina inferior izquierda de cada cara lateral.
+	int R;
+	bool find;
+	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 6] == 0', se repetirá la ejecución del bloque.
+	do{
+		find = false;
+		for(int c=1; c<5; c++){
+			// Detectar si la esquina inferior de la cara 'c' es roja.
+			if( grid[c*9 + 6] == 0 ){
+				R = c - grid[ 5*9 + (c<3 ? 12-6*c : 6*c-16) ];
+				// En caso de estar en la cara opuesta, girar dos veces y "subir" la esquina a la cara roja.
+				if(abs(R) == 2){
+					giro_horario(grid, pos, 5);
+					giro_horario(grid, pos, 5);
+					subir_esquina_izquierda(grid, pos, (c+2)%4);
+				} else if(R == 0){
+					subir_esquina_izquierda(grid, pos, c);
+				} else{
+					// Otros casos (R != 2 && R != 0), donde se requiere una división por subcasos.
+					if(c == 2 || c == 3){
+						selec_giro( grid, pos, 5, (R==1 ? false : true) );
+						subir_esquina_izquierda( grid, pos, (R==1 ? (c+2)%4+1 : c%4+1) );
+					} else{
+						if(abs(R) == 1){
+							selec_giro( grid, pos, 5, (c==1 ? false : true) );
+							subir_esquina_izquierda( grid, pos, (c==1 ? (c+2)%4+1 : c%4+1) );
+						} else{
+							selec_giro( grid, pos, 5, (c==1 ? true : false) );
+							subir_esquina_izquierda( grid, pos, (R==1 ? c%4+1 : (c+2)%4+1) );
+						}
+					}
+				}
+			}
+		}
+
+		// Comprobar si existe algún otro valor 'c' que satisfaga 'grid[c*9 + 6] == 0'. En dado caso, se repetirá el código.
+		for(int c=1; c<5; c++){
+			// Detectar si la esquina inferior de la cara 'c' es roja.
+			if( grid[c*9 + 6] == 0 ){
+				find = true;
+			}
+		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.
+	} while(find);
+
+	// Paso 3: Buscar 'rojo' (0) en la esquina inferior derecha de cada cara lateral.
+	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 8] == 0', se repetirá la ejecución del bloque.
+	do{
+		find = false;
+		for(int c=1; c<5; c++){
+			// Detectar si la esquina inferior de la cara 'c' es roja.
+			if( grid[c*9 + 8] == 0 ){
+				R = c - grid[ 5*9 + (c<3 ? 2*c-2 : 14-2*c) ];
+				// En caso de estar en la cara opuesta, girar dos veces y "subir" la esquina a la cara roja.
+				if(abs(R) == 2){
+					giro_horario(grid, pos, 5);
+					giro_horario(grid, pos, 5);
+					subir_esquina_derecha(grid, pos, (c+2)%4);
+				} else if(R == 0){
+					subir_esquina_derecha(grid, pos, c);
+				} else{
+					// Otros casos (R != 2 && R != 0), donde se requiere una división por subcasos.
+					if(c == 2 || c == 3){
+						selec_giro( grid, pos, 5, (R==1 ? false : true) );
+						subir_esquina_derecha( grid, pos, (R==1 ? (c+2)%4+1 : c%4+1) );
+					} else{
+						if(abs(R) == 1){
+							selec_giro( grid, pos, 5, (c==1 ? false : true) );
+							subir_esquina_derecha( grid, pos, (c==1 ? (c+2)%4+1 : c%4+1) );
+						} else{
+							selec_giro( grid, pos, 5, (c==1 ? true : false) );
+							subir_esquina_derecha( grid, pos, (R==1 ? c%4+1 : (c+2)%4+1) );
+						}
+					}
+				}
+			}
+		}
+
+		// Comprobar si existe algún otro valor 'c' que satisfaga 'grid[c*9 + 6] == 0'. En dado caso, se repetirá el código.
+		for(int c=1; c<5; c++){
+			// Detectar si la esquina inferior de la cara 'c' es roja.
+			if( grid[c*9 + 8] == 0 ){
+				find = true;
+			}
+		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.
+	} while(find);
+
 }
 
 
@@ -256,7 +400,7 @@ void giro_horario(int* grid,  int* p, int eje) {
 		// Paso 2: Actualizar '0'.
 		for (int i = 0; i < 3; i++) {
 			// [0 <- c1].
-			grid[ p[ (eje - 1) * 12 + 3 * 0 + i ] ] = grid[ c1 * 9 + p[ (eje - 1) * 12 + 3 * 1 + i ] ];
+			grid[ p[ (eje - 1) * 12 + i + 3 * 0 ] ] = grid[ c1 * 9 + p[ (eje - 1) * 12 + i + 3 * 1 ] ];
 		}
 
 		// Paso 3: Actualizar 'C1'.

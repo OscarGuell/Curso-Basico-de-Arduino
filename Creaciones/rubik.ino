@@ -62,19 +62,19 @@ void giro_horario(int* grid,  int* p, int eje) {
   int aux[3];
   
   // Parte A: Caras laterales.
-  
+  	int K, F, c1, c2;
 	// Caso #1: Cara roja (0) o naranja (5).
 	if (eje == 0 || eje == 5) {
-		K = (eje == 0 ? 1 : 4);
+		K = ((eje == 0) ? 1 : 4);
 		// Respaldar los valores de la primera cara (1 o 4) en un array auxiliar.
 		for (int i = 0; i < 3; i++) {
 			aux[i] = grid[K*9 + i];
 		}
 		// Sobreescribir la cara actual con los valores de la siguiente cara.
 		for (int c = 1; c < 4; c++) {
-			F = (eje == 0 ? c : 5-c);
+			F = ((eje == 0) ? c : 5-c);
 			for (int i = 0; i < 3; i++) {
-				grid[F*9 + i] = grid[ (F + (eje == 0 ? 1 : -1) ) * 9 + i ];
+				grid[F*9 + i] = grid[ (F + ((eje == 0) ? 1 : -1) ) * 9 + i ];
 			}
 		}
 		// Asignar los valores guardados a la última cara (4 o 1).
@@ -85,9 +85,9 @@ void giro_horario(int* grid,  int* p, int eje) {
 	// Caso #2: Azul (1), Blanco (2), Verde(3) o Amarillo (4).
 	} else {
 		// c1: Primera cara lateral.
-		int c1 = (eje + 2) % 4 + 1;
+		c1 = (eje + 2) % 4 + 1;
 		// c2: Segunda cara lateral.
-		int c2 = eje % 4 + 1;
+		c2 = eje % 4 + 1;
 
 		// Paso 1: Respaldar los valores de la cara inicial (0) en 'aux'.
 		for (int i = 0; i < 3; i++) {
@@ -243,7 +243,7 @@ void hilera_superior_cara_lateral(int* grid, int* pos, int c){
 	// Detectar si hay una arista roja en la hilera superior de la cara 'c'.
 	if( grid[c*9 + 1] == 0 ){
 		// En caso de haber, asegura que un giro horario sobre la cara no retire una arista roja de la cara Naranja (5).
-		while( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+		while( grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
 			giro_horario(grid, pos, 5);
 		}
 		// Giro horario en la cara donde se encontró una arista roja.
@@ -254,9 +254,9 @@ void hilera_superior_cara_lateral(int* grid, int* pos, int c){
 		// Se coloca la arista roja en la cara Naranja (5) mediante un giro antihorario en la siguiente cara lateral.
 		giro_antihorario(grid, pos, c%4+1);
 		// Comprobar que regresar la cara actual a su estado original no retirará una arista roja.
-		if( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+		if( grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
 			int rec = 0;
-			while( grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+			while( grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
 				// 'rec' se utiliza para detener el ciclo 'while' en caso de que se detecten todas las aristas rojas en la cara Naranja.
 				// Para la comprobación, un máximo de tres giros es suficiente.
 				if(rec == 2){
@@ -279,15 +279,15 @@ void lado_izquierdo_cara_lateral(int* grid, int* pos, int c){
 	// Detectar si hay una arista roja en el lado izquierdo de la cara 'c'.
 	if( grid[c*9 + 3] == 0 ){
 		// En caso de haber, comprobar que un giro horario en la cara anterior (K) no retire una arista roja de la cara Naranja (5).
-		while( grid[ 5*9 + (K<3 ? 5-2*K : 2*K-1) ] == 0 ){
+		while( grid[ 5*9 + ((K<3) ? 5-2*K : 2*K-1) ] == 0 ){
 			giro_horario(grid, pos, 5);
 		}
 		// Colocar la arista roja encontrada en la cara Naranja (5).
 		giro_horario(grid, pos, K);
 		// Comprobar si el movimiento colocó una arista roja en la cara Roja (0).
-		if( grid[ (4*K-9)*(K<3 ? -1 : 1) ] ){
+		if( grid[ (4*K-9)*((K<3) ? -1 : 1) ] ){
 			// En caso de haberse colocado, comprobar que el envío no reemplace a otra arista roja en la cara Naranja (5).
-			while( grid[ 5*9 + (K<3 ? 5-2*K : 2*K-1) ] == 0 ){
+			while( grid[ 5*9 + ((K<3) ? 5-2*K : 2*K-1) ] == 0 ){
 				// En caso de encontrar conflicto, girar la cara Naranja (5) hasta resolverlo.
 				giro_horario(grid, pos, 5);
 			}
@@ -313,7 +313,7 @@ void lado_derecho_cara_lateral(int* grid, int* pos, int c){
 	// Detectar si hay una arista roja al lado derecho de la cara 'c'.
 	if( grid[c*9 + 5] == 0 ){
 		// En caso de haber, comprobar que un giro antihorario en la cara siguiente (F) no retire una arista roja de la cara Naranja (5).
-		while( grid[ 5*9 + (F<3 ? 5-2*F : 2*F-1) ] == 0 ){
+		while( grid[ 5*9 + ((F<3) ? 5-2*F : 2*F-1) ] == 0 ){
 			giro_horario(grid, pos, 5);
 		}
 		// Colocar la arista roja encontrada en la cara Naranja (5).
@@ -335,7 +335,7 @@ void esquinas_rojas_cara_naranja(int* grid, int* pos){
 	// Recorrer las esquinas de la cara naranja.
 	for(int i=1; i<5; i++){
 		// En caso de encontrar una esquina roja, busca alinearla en la cara lateral correcta.
-		if( grid[ 5*9 + 2*i + (i<3 ? -2 : 0) ] == 0 ){
+		if( grid[ 5*9 + 2*i + ((i<3) ? -2 : 0) ] == 0 ){
 			rec = false;
 			c = i;
 			while(rec == false){
@@ -385,7 +385,7 @@ void esquina_roja_hilera_inferior_izquierda(int* grid, int* pos, int c){
 	int R;
 	// Detectar si la esquina inferior izquierda de la cara 'c' es roja.
 	if( grid[c*9 + 6] == 0 ){
-		R = c - grid[ 5*9 + (c<3 ? 12-6*c : 6*c-16) ];
+		R = c - grid[ 5*9 + ((c<3) ? 12-6*c : 6*c-16) ];
 		// En caso de estar en la cara opuesta, girar dos veces y "subir" la esquina a la cara roja.
 		if(abs(R) == 2){
 			giro_horario(grid, pos, 5);
@@ -396,48 +396,79 @@ void esquina_roja_hilera_inferior_izquierda(int* grid, int* pos, int c){
 		} else{
 			// Otros casos (R != 2 && R != 0), donde se requiere una división por subcasos.
 			if(c == 2 || c == 3){
-				selec_giro( grid, pos, 5, (R==1 ? false : true) );
-				subir_esquina_izquierda( grid, pos, (R==1 ? (c+2)%4+1 : c%4+1) );
+				selec_giro( grid, pos, 5, ((R==1) ? false : true) );
+				subir_esquina_izquierda( grid, pos, ((R==1) ? (c+2)%4+1 : c%4+1) );
 			} else{
 				if(abs(R) == 1){
-					selec_giro( grid, pos, 5, (c==1 ? false : true) );
-					subir_esquina_izquierda( grid, pos, (c==1 ? (c+2)%4+1 : c%4+1) );
+					selec_giro( grid, pos, 5, ((c==1) ? false : true) );
+					subir_esquina_izquierda( grid, pos, ((c==1) ? (c+2)%4+1 : c%4+1) );
 				} else{
-					selec_giro( grid, pos, 5, (c==1 ? true : false) );
-					subir_esquina_izquierda( grid, pos, (R==1 ? c%4+1 : (c+2)%4+1) );
+					selec_giro( grid, pos, 5, ((c==1) ? true : false) );
+					subir_esquina_izquierda( grid, pos, ((R==1) ? c%4+1 : (c+2)%4+1) );
 				}
 			}
 		}
 	}
 }
 
-void esquina_roja_hilera_inferior_derecha(int* grid, int* pos){
+void esquina_roja_hilera_inferior_derecha(int* grid, int* pos, int c){
+	int R;
 	// Detectar si la esquina inferior derecha de la cara 'c' es roja.
 	if( grid[c*9 + 8] == 0 ){
-		R = c - grid[ 5*9 + (c<3 ? 2*c-2 : 14-2*c) ];
+		R = c - grid[ 5*9 + ((c<3) ? 2*c-2 : 14-2*c) ];
 		// En caso de estar en la cara opuesta, girar dos veces y "subir" la esquina a la cara roja.
 		if(abs(R) == 2){
 			giro_horario(grid, pos, 5);
 			giro_horario(grid, pos, 5);
-			subir_esquina_derecha(grid, pos, (c+2)%4);
+			// (c+1)%4+1: Cara lateral opuesta a 'c'.
+			subir_esquina_derecha(grid, pos, (c+1)%4+1);
 		} else if(R == 0){
 			subir_esquina_derecha(grid, pos, c);
 		} else{
 			// Otros casos (R != 2 && R != 0), donde se requiere una división por subcasos.
 			if(c == 2 || c == 3){
-				selec_giro( grid, pos, 5, (R==1 ? false : true) );
-				subir_esquina_derecha( grid, pos, (R==1 ? (c+2)%4+1 : c%4+1) );
+				selec_giro( grid, pos, 5, ((R==1) ? false : true) );
+				subir_esquina_derecha( grid, pos, ((R==1) ? (c+2)%4+1 : c%4+1) );
 			} else{
 				if(abs(R) == 1){
-					selec_giro( grid, pos, 5, (c==1 ? false : true) );
-					subir_esquina_derecha( grid, pos, (c==1 ? (c+2)%4+1 : c%4+1) );
+					selec_giro( grid, pos, 5, ((c==1) ? false : true) );
+					subir_esquina_derecha( grid, pos, ((c==1) ? (c+2)%4+1 : c%4+1) );
 				} else{
-					selec_giro( grid, pos, 5, (c==1 ? true : false) );
-					subir_esquina_derecha( grid, pos, (R==1 ? c%4+1 : (c+2)%4+1) );
+					selec_giro( grid, pos, 5, ((c==1) ? true : false) );
+					subir_esquina_derecha( grid, pos, ((R==1) ? c%4+1 : (c+2)%4+1) );
 				}
 			}
 		}
 	}
+}
+
+void revision_superior(int* grid, int* pos){
+	int R;
+	bool find;
+	// Recorrer las diagonales de la cara Roja (0).
+	do{
+		find = false;
+		for(int i=1; i<5; i++){
+			R = (i < 3) ? 3-i : i;
+			// Detectar esquinas rojas en la cara Roja, pero en su posición incorrecta.
+			if( grid[ 2*i + ((i<3) ? -2 : 0) ] == 0 && grid[R*9 + 2] != R ){
+				giro_horario(grid, pos, R);
+				giro_horario(grid, pos, 5);
+				giro_antihorario(grid, pos, R);
+				subir_esquina_izquierda(grid, pos, (R+1)%4+1);
+			}
+		}
+		// Verificar si es necesario volver a hacer el ciclo.
+		for(int i=1; i<5; i++){
+			R = (i<3) ? 3-i : i;
+			// Detectar esquinas rojas en la cara Roja, pero en su posición incorrecta.
+			if( grid[ 2*i + ((i<3) ? -2 : 0) ] == 0 && grid[R*9 + 2] != R ){
+				find = true;
+				break;
+			}
+		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.
+	} while(find);
 }
 
 // Función para resolver el cubo.
@@ -452,13 +483,13 @@ void solve(int* grid, int* pos){
 	for(int i=0; i<4; i++){
 		if( grid[2*i + 1] == 0 ){
 			// Comprobar que el envío no reemplace a otra arista roja en la cara Naranja (5).
-			while( grid[ 5*9 + (i<2 ? 4*i+1 : 4*i-5) ] == 0 ){
+			while( grid[ 5*9 + ((i<2) ? 4*i+1 : 4*i-5) ] == 0 ){
 				// En caso de encontrar conflicto, girar la cara Naranja (5) hasta resolverlo.
 				giro_horario(grid, pos, 5);
 			}
 			// Colocar la arista roja en la cara Naranja (5).
-			giro_horario( grid, pos, (i<2 ? i+2 : 3*i-5) );
-			giro_horario( grid, pos, (i<2 ? i+2 : 3*i-5) );
+			giro_horario( grid, pos, ((i<2) ? i+2 : 3*i-5) );
+			giro_horario( grid, pos, ((i<2) ? i+2 : 3*i-5) );
 		}
 	}
 	
@@ -502,7 +533,7 @@ void solve(int* grid, int* pos){
 		// Explorar las caras laterales.
 		for(int c=1; c<5; c++){
 			// Buscar aristas en la hilera inferior que coincidan con el color del centro de la cara.
-			if( grid[c*9 + 7] == c && grid[ 5*9 + (c<3 ? 5-2*c : 2*c-1) ] == 0 ){
+			if( grid[c*9 + 7] == c && grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
 				giro_horario(grid, pos, c);
 				giro_horario(grid, pos, c);
 				rep++;
@@ -517,9 +548,8 @@ void solve(int* grid, int* pos){
 
 	// Paso 1: Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.
 	Serial.println("Paso 1. Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.");
-	for(int c=1; c<5; c++){
-		
-	}
+	revision_superior(grid, pos);
+	
 	// Paso 2: Buscar esquinas rojas en la cara Naranja (5).
 	Serial.println("Paso 2: Buscar esquinas rojas en la cara Naranja.");
 	esquinas_rojas_cara_naranja(grid, pos);
@@ -575,7 +605,7 @@ void solve(int* grid, int* pos){
 				// K: Cara lateral anterior.
 				int K = (c+2) % 4 + 1;
 				// Caso #1: Esquina en posición correcta, pero orientación incorrecta.
-				if( grid[ (c<3 ? 14-6*c : 6*c-18) ] == K ){
+				if( grid[ ((c<3) ? 14-6*c : 6*c-18) ] == K ){
 					giro_horario(grid, pos, K);
 					giro_antihorario(grid, pos, 5);
 					giro_antihorario(grid, pos, K);
@@ -598,7 +628,7 @@ void solve(int* grid, int* pos){
 				// F: Cara lateral siguiente.
 				int F = c % 4 + 1;
 				// Caso #1: Esquina en posición correcta, pero orientación incorrecta.
-				if( grid[ (c<3 ? 4-2*c : 3*c) ] == F ){
+				if( grid[ ((c<3) ? 4-2*c : 3*c) ] == F ){
 					giro_antihorario(grid, pos, F);
 					giro_horario(grid, pos, 5);
 					giro_horario(grid, pos, F);

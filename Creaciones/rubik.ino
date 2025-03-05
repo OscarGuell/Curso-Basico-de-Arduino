@@ -56,6 +56,189 @@ int p6 = 9;
 int *grid_ptr;
 int *pos_ptr;
 
+// Función para realizar un giro horario
+void giro_horario(int* grid,  int* p, int eje) {
+
+  int aux[3];
+  
+  // Parte A: Caras laterales.
+  
+	// Caso #1: Cara roja (0) o naranja (5).
+	if (eje == 0 || eje == 5) {
+		K = (eje == 0 ? 1 : 4);
+		// Respaldar los valores de la primera cara (1 o 4) en un array auxiliar.
+		for (int i = 0; i < 3; i++) {
+			aux[i] = grid[K*9 + i];
+		}
+		// Sobreescribir la cara actual con los valores de la siguiente cara.
+		for (int c = 1; c < 4; c++) {
+			F = (eje == 0 ? c : 5-c);
+			for (int i = 0; i < 3; i++) {
+				grid[F*9 + i] = grid[ (F + (eje == 0 ? 1 : -1) ) * 9 + i ];
+			}
+		}
+		// Asignar los valores guardados a la última cara (4 o 1).
+		for (int i = 0; i < 3; i++) {
+			grid[ (5-K)*9 + i ] = aux[i];
+		}
+
+	// Caso #2: Azul (1), Blanco (2), Verde(3) o Amarillo (4).
+	} else {
+		// c1: Primera cara lateral.
+		int c1 = (eje + 2) % 4 + 1;
+		// c2: Segunda cara lateral.
+		int c2 = eje % 4 + 1;
+
+		// Paso 1: Respaldar los valores de la cara inicial (0) en 'aux'.
+		for (int i = 0; i < 3; i++) {
+			aux[i] = grid[ p[ (eje - 1) * 12 + i] ];
+		}
+
+		// Paso 2: Actualizar '0'.
+		for (int i = 0; i < 3; i++) {
+			// [0 <- c1].
+			grid[ p[ (eje - 1) * 12 + i + 3 * 0 ] ] = grid[ c1 * 9 + p[ (eje - 1) * 12 + i + 3 * 1 ] ];
+		}
+
+		// Paso 3: Actualizar 'C1'.
+		for (int i = 0; i < 3; i++) {
+			// [c1 <- 5].
+			grid[ c1 * 9 + p[ (eje - 1) * 12 + ((eje == 3 || eje == 4) ? (2 - i) : i) + 3 * 1 ] ] = grid[ 5 * 9 + p[ (eje - 1) * 12 + i + 3 * 2 ] ];
+		}
+
+		// Paso 4: Actualizar '5'.
+		for (int i = 0; i < 3; i++) {
+			// [5 <- c2].
+			grid[ 5 * 9 + p[ (eje - 1) * 12 + ((eje == 1 || eje == 4) ? (2 - i) : i) + 3 * 2] ] = grid[c2 * 9 + p[ (eje - 1) * 12 + i + 3 * 3] ];
+		}
+
+		// Paso 5: Usar 'aux' para actualizar la cara final (C2).
+		for (int i = 0; i < 3; i++) {
+			// [c2 <- aux].
+			// Última ronda, empleando los valores auxiliares.
+			grid[ c2 * 9 + p[ (eje - 1) * 12 + ((eje == 2 || eje == 3) ? (2 - i) : i) + 3 * 3 ] ] = aux[ ((eje == 1 || eje == 2) ? (2 - i) : i) ];
+		}
+	}
+
+  // Parte B: Rotación de la cara seleccionada.
+
+	// Respaldar los valores originales de la cara a rotar en un array temporal.
+	int temp[9];
+	for (int i = 0; i < 9; i++) {
+		temp[i] = grid[eje * 9 + i];
+	}
+
+	// Aplicar la rotación A[i][j] -> A[j][2-i].
+	for (int j = 0; j < 3; j++) {
+		for (int i = 0; i < 3; i++) {
+			grid[eje * 9 + j * 3 + (2 - i)] = temp[i * 3 + j];
+		}
+	}
+    
+  Serial.print("Giro horario. Cara ");
+  Serial.println(eje);
+  
+}
+
+
+// Función para realizar un giro antihorario
+void giro_antihorario(int* grid, int* p, int eje) {
+
+  int aux[3];
+  
+  // Parte A: Caras laterales.
+
+	// Caso #1: Cara roja (0).
+	if (eje == 0) {
+		// Respaldar los valores de la última cara (4) en un array auxiliar.
+		for (int i = 0; i < 3; i++) {
+			aux[i] = grid[4 * 9 + i];
+		}
+		// Sobreescribir la cara actual con los valores de la cara anterior.
+		for (int c = 4; c > 1; c--) {
+			for (int i = 0; i < 3; i++) {
+				grid[c * 9 + i] = grid[(c - 1) * 9 + i];
+			}
+		}
+		// Asignar los valores guardados a la primera cara (1).
+		for (int i = 0; i < 3; i++) {
+			grid[9 + i] = aux[i];
+		}
+
+	// Caso #2: Cara naranja (5).
+	} else if (eje == 5) {
+		// Respaldar los valores de la primera cara (1) en un array auxiliar.
+		for (int i = 0; i < 3; i++) {
+			aux[i] = grid[9 + i];
+		}
+		// Sobreescribir la cara actual con los valores de la siguiente cara.
+		for (int c = 1; c < 4; c++) {
+			for (int i = 0; i < 3; i++) {
+				grid[c * 9 + i] = grid[(c + 1) * 9 + i];
+			}
+		}
+		// Asignar los valores guardados a la última cara (4).
+		for (int i = 0; i < 3; i++) {
+			grid[4 * 9 + i] = aux[i];
+		}
+
+	// Caso #3: Azul (1), Blanco (2), Verde(3) o Amarillo (4).
+	} else {
+
+		int c1 = (eje + 2) % 4 + 1;
+		int c2 = eje % 4 + 1;
+
+		// Paso 1: Respaldar los valores de la cara final (C2) en 'aux'.
+		for (int i = 0; i < 3; i++) {
+			aux[i] = grid[c2 * 9 + p[(eje - 1) * 12 + i + 3 * 3]];
+		}
+
+		// Paso 2: Actualizar 'C2'.
+		for (int i = 0; i < 3; i++) {
+			// [c2 <- 5].
+			grid[c2 * 9 + p[(eje - 1) * 12 + i + 3 * 3]] = grid[5 * 9 + p[(eje - 1) * 12 + ((eje == 1 || eje == 4) ? (2 - i) : i) + 3 * 2]];
+		}
+
+		// Paso 3: Actualizar '5'.
+		for (int i = 0; i < 3; i++) {
+			// [5 <- c1].
+			grid[5 * 9 + p[(eje - 1) * 12 + ((eje == 3 || eje == 4) ? (2 - i) : i) + 3 * 2]] = grid[c1 * 9 + p[(eje - 1) * 12 + 3 * 1 + i]];
+		}
+
+		// Paso 4: Actualizar 'C1'.
+		for (int i = 0; i < 3; i++) {
+			// [c1 <- 0].
+			grid[c1 * 9 + p[(eje - 1) * 12 + 3 * 1 + i]] = grid[p[(eje - 1) * 12 + i]];
+		}
+
+		// Paso 5: Usar 'aux' para actualizar la cara inicial (0).
+		for (int i = 0; i < 3; i++) {
+			// [0 <- aux].
+			grid[p[(eje - 1) * 12 + i]] = aux[i];
+		}
+	}
+
+  // Parte B: Rotación de la cara seleccionada (A[j][2-i] -> A[i][j]).
+
+	// Respaldar los valores originales de la cara a rotar en un array temporal.
+	int temp[9];
+	for (int i = 0; i < 9; i++) {
+		temp[i] = grid[eje * 9 + i];
+	}
+
+	// Aplicar la rotación A[j][2-i] -> A[i][j].
+	for (int j = 0; j < 3; j++) {
+		for (int i = 0; i < 3; i++) {
+			grid[eje * 9 + i * 3 + j] = temp[j * 3 + (2 - i)];
+		}
+	}
+  
+  Serial.print("Giro antihorario. Cara ");
+  Serial.println(eje);
+  
+}
+
+
 void hilera_superior_cara_lateral(int* grid, int* pos, int c){
 	// Detectar si hay una arista roja en la hilera superior de la cara 'c'.
 	if( grid[c*9 + 1] == 0 ){
@@ -261,8 +444,10 @@ void esquina_roja_hilera_inferior_derecha(int* grid, int* pos){
 void solve(int* grid, int* pos){
 	
 // Parte A: Colocar la cruz roja.
+  	Serial.println("Parte A. Cruz roja.");
 	
 	// Paso 1: Buscar aristas rojas en la cara Roja (0).
+	Serial.println("Paso 1. Buscar aristas rojas en la cara Roja.");
 	// En caso de encontrar una arista roja en la cara Roja (0), la envía a la cara Naranja (5).
 	for(int i=0; i<4; i++){
 		if( grid[2*i + 1] == 0 ){
@@ -278,21 +463,25 @@ void solve(int* grid, int* pos){
 	}
 	
 	// Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral (1-4).
+	Serial.println("Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral.");
 	for(int c=1; c<5; c++){
 		hilera_superior_cara_lateral(grid, pos, c);
 	}
 
 	// Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral (1-4).
+	Serial.println("Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral.");
 	for(int c=1; c<5; c++){
 		lado_izquierdo_cara_lateral(grid, pos, c);
 	}
 
 	// Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral (1-4).
+	Serial.println("Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral.");
 	for(int c=1; c<5; c++){
 		lado_derecho_cara_lateral(grid, pos, c);
 	}
 
 	// Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral (1-4).
+	Serial.println("Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral.");
 	for(int c=1; c<5; c++){
 		// Detectar si hay una arista roja en la hilera inferior de la cara 'c'.
 		if( grid[c*9 + 7] == 0 ){
@@ -306,6 +495,7 @@ void solve(int* grid, int* pos){
 	}
 
 	// Paso 6: Una vez colocadas todas las aristas rojas en la cara Naranja (5), se mueven a la cara Roja (0).
+	Serial.println("Paso 6: Buscar aristas rojas en la hilera inferior de cada cara lateral.");
 	int rep = 0;
 	// Iterar hasta haber desplazado 4 aristas.
 	while(rep < 4){
@@ -323,15 +513,19 @@ void solve(int* grid, int* pos){
 	}
 
 // Parte B: Esquinas de la cara Roja (0).
+	Serial.println("Parte B: Esquinas de la cara Roja.");
 
-	// Paso 0: Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.
+	// Paso 1: Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.
+	Serial.println("Paso 1. Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.");
 	for(int c=1; c<5; c++){
 		
 	}
-	// Paso 1: Buscar esquinas rojas en la cara Naranja (5).
+	// Paso 2: Buscar esquinas rojas en la cara Naranja (5).
+	Serial.println("Paso 2: Buscar esquinas rojas en la cara Naranja.");
 	esquinas_rojas_cara_naranja(grid, pos);
 
-	// Paso 2: Buscar 'rojo' (0) en la esquina inferior izquierda de cada cara lateral.
+	// Paso 3: Buscar 'rojo' (0) en la esquina inferior izquierda de cada cara lateral.
+	Serial.println("Paso 3: Buscar 'rojo' en la esquina inferior izquierda de cada cara lateral.");
 	bool find;
 	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 6] == 0', se repetirá la ejecución del bloque.
 	do{
@@ -351,7 +545,8 @@ void solve(int* grid, int* pos){
 	// En caso de 'find == true', se ejecutará nuevamente el código.
 	} while(find);
 
-	// Paso 3: Buscar 'rojo' (0) en la esquina inferior derecha de cada cara lateral.
+	// Paso 4: Buscar 'rojo' (0) en la esquina inferior derecha de cada cara lateral.
+	Serial.println("Paso 4: Buscar 'rojo' en la esquina inferior derecha de cada cara lateral.");
 	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 8] == 0', se repetirá la ejecución del bloque.
 	do{
 		find = false;
@@ -370,7 +565,8 @@ void solve(int* grid, int* pos){
 	// En caso de 'find == true', se ejecutará nuevamente el código.
 	} while(find);
 
-	// Paso 4: Buscar esquinas rojas en la hilera superior de las caras laterales.
+	// Paso 5: Buscar esquinas rojas en la hilera superior de las caras laterales.
+	Serial.println("Paso 5: Buscar esquinas rojas en la hilera superior de las caras laterales.");
 	do{
 		find = false;
 		for(int c=1; c<5; c++){
@@ -432,191 +628,11 @@ void solve(int* grid, int* pos){
 	} while(find);
 
 // Parte C: Aristas intermedias.
+	Serial.println("Parte C: Aristas intermedias.");
 	
 }
 
 
-// Función para realizar un giro horario
-void giro_horario(int* grid,  int* p, int eje) {
-
-  int aux[3];
-  
-  // Parte A: Caras laterales.
-  
-	// Caso #1: Cara roja (0) o naranja (5).
-	if (eje == 0 || eje == 5) {
-		K = (eje == 0 ? 1 : 4);
-		// Respaldar los valores de la primera cara (1 o 4) en un array auxiliar.
-		for (int i = 0; i < 3; i++) {
-			aux[i] = grid[K*9 + i];
-		}
-		// Sobreescribir la cara actual con los valores de la siguiente cara.
-		for (int c = 1; c < 4; c++) {
-			F = (eje == 0 ? c : 5-c);
-			for (int i = 0; i < 3; i++) {
-				grid[F*9 + i] = grid[ (F + (eje == 0 ? 1 : -1) ) * 9 + i ];
-			}
-		}
-		// Asignar los valores guardados a la última cara (4 o 1).
-		for (int i = 0; i < 3; i++) {
-			grid[ (5-K)*9 + i ] = aux[i];
-		}
-
-	// Caso #2: Azul (1), Blanco (2), Verde(3) o Amarillo (4).
-	} else {
-		// c1: Primera cara lateral.
-		int c1 = (eje + 2) % 4 + 1;
-		// c2: Segunda cara lateral.
-		int c2 = eje % 4 + 1;
-
-		// Paso 1: Respaldar los valores de la cara inicial (0) en 'aux'.
-		for (int i = 0; i < 3; i++) {
-			aux[i] = grid[ p[ (eje - 1) * 12 + i] ];
-		}
-
-		// Paso 2: Actualizar '0'.
-		for (int i = 0; i < 3; i++) {
-			// [0 <- c1].
-			grid[ p[ (eje - 1) * 12 + i + 3 * 0 ] ] = grid[ c1 * 9 + p[ (eje - 1) * 12 + i + 3 * 1 ] ];
-		}
-
-		// Paso 3: Actualizar 'C1'.
-		for (int i = 0; i < 3; i++) {
-			// [c1 <- 5].
-			grid[ c1 * 9 + p[ (eje - 1) * 12 + ((eje == 3 || eje == 4) ? (2 - i) : i) + 3 * 1 ] ] = grid[ 5 * 9 + p[ (eje - 1) * 12 + i + 3 * 2 ] ];
-		}
-
-		// Paso 4: Actualizar '5'.
-		for (int i = 0; i < 3; i++) {
-			// [5 <- c2].
-			grid[ 5 * 9 + p[ (eje - 1) * 12 + ((eje == 1 || eje == 4) ? (2 - i) : i) + 3 * 2] ] = grid[c2 * 9 + p[ (eje - 1) * 12 + i + 3 * 3] ];
-		}
-
-		// Paso 5: Usar 'aux' para actualizar la cara final (C2).
-		for (int i = 0; i < 3; i++) {
-			// [c2 <- aux].
-			// Última ronda, empleando los valores auxiliares.
-			grid[ c2 * 9 + p[ (eje - 1) * 12 + ((eje == 2 || eje == 3) ? (2 - i) : i) + 3 * 3 ] ] = aux[ ((eje == 1 || eje == 2) ? (2 - i) : i) ];
-		}
-	}
-
-  // Parte B: Rotación de la cara seleccionada.
-
-	// Respaldar los valores originales de la cara a rotar en un array temporal.
-	int temp[9];
-	for (int i = 0; i < 9; i++) {
-		temp[i] = grid[eje * 9 + i];
-	}
-
-	// Aplicar la rotación A[i][j] -> A[j][2-i].
-	for (int j = 0; j < 3; j++) {
-		for (int i = 0; i < 3; i++) {
-			grid[eje * 9 + j * 3 + (2 - i)] = temp[i * 3 + j];
-		}
-	}
-    
-  Serial.print("Giro horario. Cara ");
-  Serial.println(eje);
-  
-}
-
-
-// Función para realizar un giro antihorario
-void giro_antihorario(int* grid, int* p, int eje) {
-
-  int aux[3];
-  
-  // Parte A: Caras laterales.
-
-	// Caso #1: Cara roja (0).
-	if (eje == 0) {
-		// Respaldar los valores de la última cara (4) en un array auxiliar.
-		for (int i = 0; i < 3; i++) {
-			aux[i] = grid[4 * 9 + i];
-		}
-		// Sobreescribir la cara actual con los valores de la cara anterior.
-		for (int c = 4; c > 1; c--) {
-			for (int i = 0; i < 3; i++) {
-				grid[c * 9 + i] = grid[(c - 1) * 9 + i];
-			}
-		}
-		// Asignar los valores guardados a la primera cara (1).
-		for (int i = 0; i < 3; i++) {
-			grid[9 + i] = aux[i];
-		}
-
-	// Caso #2: Cara naranja (5).
-	} else if (eje == 5) {
-		// Respaldar los valores de la primera cara (1) en un array auxiliar.
-		for (int i = 0; i < 3; i++) {
-			aux[i] = grid[9 + i];
-		}
-		// Sobreescribir la cara actual con los valores de la siguiente cara.
-		for (int c = 1; c < 4; c++) {
-			for (int i = 0; i < 3; i++) {
-				grid[c * 9 + i] = grid[(c + 1) * 9 + i];
-			}
-		}
-		// Asignar los valores guardados a la última cara (4).
-		for (int i = 0; i < 3; i++) {
-			grid[4 * 9 + i] = aux[i];
-		}
-
-	// Caso #3: Azul (1), Blanco (2), Verde(3) o Amarillo (4).
-	} else {
-
-		int c1 = (eje + 2) % 4 + 1;
-		int c2 = eje % 4 + 1;
-
-		// Paso 1: Respaldar los valores de la cara final (C2) en 'aux'.
-		for (int i = 0; i < 3; i++) {
-			aux[i] = grid[c2 * 9 + p[(eje - 1) * 12 + i + 3 * 3]];
-		}
-
-		// Paso 2: Actualizar 'C2'.
-		for (int i = 0; i < 3; i++) {
-			// [c2 <- 5].
-			grid[c2 * 9 + p[(eje - 1) * 12 + i + 3 * 3]] = grid[5 * 9 + p[(eje - 1) * 12 + ((eje == 1 || eje == 4) ? (2 - i) : i) + 3 * 2]];
-		}
-
-		// Paso 3: Actualizar '5'.
-		for (int i = 0; i < 3; i++) {
-			// [5 <- c1].
-			grid[5 * 9 + p[(eje - 1) * 12 + ((eje == 3 || eje == 4) ? (2 - i) : i) + 3 * 2]] = grid[c1 * 9 + p[(eje - 1) * 12 + 3 * 1 + i]];
-		}
-
-		// Paso 4: Actualizar 'C1'.
-		for (int i = 0; i < 3; i++) {
-			// [c1 <- 0].
-			grid[c1 * 9 + p[(eje - 1) * 12 + 3 * 1 + i]] = grid[p[(eje - 1) * 12 + i]];
-		}
-
-		// Paso 5: Usar 'aux' para actualizar la cara inicial (0).
-		for (int i = 0; i < 3; i++) {
-			// [0 <- aux].
-			grid[p[(eje - 1) * 12 + i]] = aux[i];
-		}
-	}
-
-  // Parte B: Rotación de la cara seleccionada (A[j][2-i] -> A[i][j]).
-
-	// Respaldar los valores originales de la cara a rotar en un array temporal.
-	int temp[9];
-	for (int i = 0; i < 9; i++) {
-		temp[i] = grid[eje * 9 + i];
-	}
-
-	// Aplicar la rotación A[j][2-i] -> A[i][j].
-	for (int j = 0; j < 3; j++) {
-		for (int i = 0; i < 3; i++) {
-			grid[eje * 9 + i * 3 + j] = temp[j * 3 + (2 - i)];
-		}
-	}
-  
-  Serial.print("Giro antihorario. Cara ");
-  Serial.println(eje);
-  
-}
 
 
 
@@ -745,5 +761,4 @@ void loop() {
       while( digitalRead(p6) == LOW );
     }
   }
-  
 }

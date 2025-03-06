@@ -447,6 +447,7 @@ void giro_aleatorio(int* grid, int* pos){
 }
 
 void cruz_roja(int* grid, int* pos){
+	bool find;
 	// Paso 1: Buscar aristas rojas en la cara Roja (0).
 	Serial.println("Paso 1. Buscar aristas rojas en la cara Roja.");
 	// En caso de encontrar una arista roja en la cara Roja (0), la envía a la cara Naranja (5).
@@ -473,7 +474,7 @@ void cruz_roja(int* grid, int* pos){
 		// Verificación.
 		for(int c=1; c<5; c++){
 			if( grid[c*9 + 1] == 0 ){
-				Serial.println("¡Repetir Paso 02!");
+				Serial.println("¡Repetir Paso A.2!");
 				find = true;
 				break;
 			}
@@ -492,7 +493,7 @@ void cruz_roja(int* grid, int* pos){
 		// Verificación.
 		for(int c=1; c<5; c++){
 			if( grid[c*9 + 3] == 0 ){
-				Serial.println("¡Repetir Paso 03!");
+				Serial.println("¡Repetir Paso A.3!");
 				find = true;
 				break;
 			}
@@ -511,7 +512,7 @@ void cruz_roja(int* grid, int* pos){
 		// Verificación.
 		for(int c=1; c<5; c++){
 			if( grid[c*9 + 5] == 0 ){
-				Serial.println("¡Repetir Paso 04!");
+				Serial.println("¡Repetir Paso A.4!");
 				find = true;
 				break;
 			}
@@ -537,7 +538,7 @@ void cruz_roja(int* grid, int* pos){
 		// Verificación.
 		for(int c=1; c<5; c++){
 			if( grid[c*9 + 7] == 0 ){
-				Serial.println("¡Repetir Paso 05!");
+				Serial.println("¡Repetir Paso A.5!");
 				find = true;
 				break;
 			}
@@ -573,21 +574,21 @@ void solve(int* grid, int* pos){
 	do{
 		find = true;
 		count = 0;
+		// Contar el número de aristas rojas en la cara Naranja (5).
 		for(int i = 0; i<4; i++){
-			// Contar el número de aristas rojas en la cara Naranja (5).
 			if( grid[5*9 + 1 + 2*i] == 0 ){
 				count++;
 			}
-			// Si el total es de 4 aristas rojas, se rompe el ciclo.
-			if(count == 4){
-				find = false;
-				break;
-			}
-			// Caso contrario, se repite el proceso 'cruz_roja'.
-			Serial.println("¡Repetir el proceso cruz_roja!");
-			verify(grid, pos);
-			cruz_roja(grid, pos);
 		}
+		// Si el total es de 4 aristas rojas, se rompe el ciclo.
+		if(count == 4){
+			find = false;
+			break;
+		}
+		// Caso contrario, se repite el proceso 'cruz_roja'.
+		Serial.println("¡Repetir el proceso cruz_roja!");
+		verify(grid, pos);
+		cruz_roja(grid, pos);
 	// En caso de 'find == true', se ejecutará nuevamente el código.	
 	} while(find);
 
@@ -624,7 +625,19 @@ void solve(int* grid, int* pos){
 	
 	// Paso 2: Buscar esquinas rojas en la cara Naranja (5).
 	Serial.println("Paso 2: Buscar esquinas rojas en la cara Naranja.");
-	esquinas_rojas_cara_naranja(grid, pos);
+	do{
+		find = false;
+		esquinas_rojas_cara_naranja(grid, pos);
+		// Verificación.
+		for(int i=1; i<5; i++){
+			if( grid[ 5*9 + 2*i + ((i<3) ? -2 : 0) ] == 0 ){
+				Serial.println("¡Repetir Paso B.2!");
+				find = true;
+				break;
+			}
+		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.
+	} while(false);
 
 	// Paso 3: Buscar 'rojo' (0) en la esquina inferior izquierda de cada cara lateral.
 	Serial.println("Paso 3: Buscar 'rojo' en la esquina inferior izquierda de cada cara lateral.");
@@ -640,7 +653,9 @@ void solve(int* grid, int* pos){
 		for(int c=1; c<5; c++){
 			// Detectar si la esquina inferior de la cara 'c' es roja.
 			if( grid[c*9 + 6] == 0 ){
+				Serial.println("¡Repetir Paso B.3!");
 				find = true;
+				break;
 			}
 		}
 	// En caso de 'find == true', se ejecutará nuevamente el código.

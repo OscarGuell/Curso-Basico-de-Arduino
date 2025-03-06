@@ -645,7 +645,7 @@ void solve(int* grid, int* pos){
 
 		// Verificar si es necesario repetir el bloque de código.
 		for(int c=1; c<5; c++){
-			if( grid[c*9] == 0 || grid[c*9 + 2] ){
+			if( grid[c*9] == 0 || grid[c*9 + 2] == 0){
 				find = true;
 			}
 		}

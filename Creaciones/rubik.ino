@@ -327,9 +327,10 @@ void esquinas_rojas_cara_naranja(int* grid, int* pos){
 			rec = false;
 			c = i;
 			while(rec == false){
-				if( grid[(c%4+1)*9 + 6] == c ){
+				if( grid[(c%4+1)*9 + 6] == c || grid[c*9 + 8] == c%4+1 ){
 					c = c % 4 + 1;
 					rec = true;
+					break;
 				}
 				giro_horario(grid, pos, 5);
 				c = c % 4 + 1;
@@ -397,7 +398,7 @@ void esquina_roja_hilera_inferior_derecha(int* grid, int* pos, int c){
 	if( grid[c*9 + 8] == 0 ){
 		do{
 			// Cara lateral siguiente a 'F'.
-			F = (F+2) % 4 + 1;
+			F = F % 4 + 1;
 			find = true;
 			if( grid[F*9 + 6] == F ){
 				find = false;
@@ -445,12 +446,7 @@ void giro_aleatorio(int* grid, int* pos){
 	selec_giro(grid, pos, c, f);
 }
 
-// Función para resolver el cubo.
-void solve(int* grid, int* pos){
-	
-// Parte A: Colocar la cruz roja.
-  	Serial.println("Parte A. Cruz roja.");
-	
+void cruz_roja(int* grid, int* pos){
 	// Paso 1: Buscar aristas rojas en la cara Roja (0).
 	Serial.println("Paso 1. Buscar aristas rojas en la cara Roja.");
 	// En caso de encontrar una arista roja en la cara Roja (0), la envía a la cara Naranja (5).
@@ -498,6 +494,36 @@ void solve(int* grid, int* pos){
 			giro_antihorario(grid, pos, 5);
 		}
 	}
+}
+
+// Función para resolver el cubo.
+void solve(int* grid, int* pos){
+	
+// Parte A: Colocar la cruz roja.
+	bool find;
+	int count;
+  	Serial.println("Parte A. Cruz roja.");
+	cruz_roja(grid, pos);
+
+	// Contención de errores: Si no se encuentran 4 aristas rojas en la cara Naranja (5), se repite el proceso 'cruz_roja'.
+	do{
+		find = true;
+		count = 0;
+		for(int i = 0; i<4; i++){
+			// Contar el número de aristas rojas en la cara Naranja (5).
+			if( grid[5*9 + 1 + 2*i] == 0 ){
+				count++;
+			}
+			// Si el total es de 4 aristas rojas, se rompe el ciclo.
+			if(count == 4){
+				find = false;
+				break;
+			}
+			// Caso contrario, se repite el proceso 'cruz_roja'.
+			Serial.println("¡Repetir el proceso cruz_roja!")
+			cruz_roja(grid, pos);
+		}
+	} while(find);
 
 	// Paso 6: Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).
 	Serial.println("Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).");
@@ -512,6 +538,11 @@ void solve(int* grid, int* pos){
 				giro_horario(grid, pos, c);
 				giro_horario(grid, pos, c);
 				rep++;
+				count++;
+				if(count > 12){
+					Serial.println("¡Error en Paso A.6!");
+					break;
+				}
 			}
 		}
 		// Girar la cara Naranja (5) y continuar el ciclo hasta haber desplazado 4 aristas.

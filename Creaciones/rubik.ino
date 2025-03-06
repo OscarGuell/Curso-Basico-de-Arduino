@@ -575,12 +575,12 @@ void cruz_roja(int* grid, int* pos){
 
 
 
-void verify(int* grid, int* pos){
+void verify(int* grid, int* pos, int C){
 	// Verificación de la posición de las piezas rojas.
 	for(int c=0; c<6; c++){
 		for(int i=0; i<9; i++){
-			if( grid[c*9 + i] == 0 ){
-				Serial.print("Rojo en cara ");
+			if( grid[c*9 + i] == C ){
+				Serial.print("Cara ");
 				Serial.print(c);
 				Serial.print(", pos ");
 				Serial.println(i);
@@ -774,6 +774,14 @@ void permutar_aristas(int* grid, int* pos, int c){
 
 
 
+bool revisar_posicion(int* grid, int* pos, int c){}
+
+
+
+void permutar_esquinas(int* grid, int* pos, int c){}
+
+
+
 // Función para resolver el cubo.
 void solve(int* grid, int* pos){
 	
@@ -845,7 +853,7 @@ void solve(int* grid, int* pos){
 	} while(find);
 	
 	// Verificación.
-	verify(grid, pos);
+	verify(grid, pos, 0);
 	
 
 // Parte C: Aristas intermedias.
@@ -926,7 +934,7 @@ void solve(int* grid, int* pos){
 		}
 	} while(find);
 
-// Parte D. Cruz naranja.
+// Parte D. Cara naranja.
 	Serial.println("Parte D: Cruz naranja.");
 	Serial.println("Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja.");
 	// Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja (5).
@@ -1007,7 +1015,20 @@ void solve(int* grid, int* pos){
 	// Línea a la que el código para continuar con el siguiente paso.
 	loops_exit;
 
-	
+	// Paso 3: Orientación de las esquinas.
+	Serial.println("Paso 3: Orientación de las esquinas.");
+	// Buscar una esquina en su posición y orientación correcta.
+	for(int c=1; c<5; c++){
+		// Revisar desde la esquina inferior izquierda de las caras laterales.
+		if( revisar_posicion(grid, pos, c) ){
+			// Verificar si el resto de esquinas están en sus posiciones correctas.
+			F = c % 4 + 1;
+			//revisar_posicion(grid, pos, F);
+			
+		}
+	}
+
+	verify(grid, pos, 0);
 }
 
 

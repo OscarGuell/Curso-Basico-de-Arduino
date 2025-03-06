@@ -273,7 +273,7 @@ void lado_izquierdo_cara_lateral(int* grid, int* pos, int c){
 		// Colocar la arista roja encontrada en la cara Naranja (5).
 		giro_horario(grid, pos, K);
 		// Comprobar si el movimiento colocó una arista roja en la cara Roja (0).
-		if( grid[ (4*K-9)*((K<3) ? -1 : 1) ] ){
+		if( grid[ (4*K-9)*((K<3) ? -1 : 1) ] == 0 ){
 			// En caso de haberse colocado, comprobar que el envío no reemplace a otra arista roja en la cara Naranja (5).
 			while( grid[ 5*9 + ((K<3) ? 5-2*K : 2*K-1) ] == 0 ){
 				// En caso de encontrar conflicto, girar la cara Naranja (5) hasta resolverlo.
@@ -561,64 +561,8 @@ void verify(int* grid, int* pos){
 	}
 }
 
-// Función para resolver el cubo.
-void solve(int* grid, int* pos){
-	
-// Parte A: Colocar la cruz roja.
+void esquinas_cara_roja(int* grid, int* pos){
 	bool find;
-	int count;
-  	Serial.println("Parte A. Cruz roja.");
-	cruz_roja(grid, pos);
-
-	// Contención de errores: Si no se encuentran 4 aristas rojas en la cara Naranja (5), se repite el proceso 'cruz_roja'.
-	do{
-		find = true;
-		count = 0;
-		// Contar el número de aristas rojas en la cara Naranja (5).
-		for(int i = 0; i<4; i++){
-			if( grid[5*9 + 1 + 2*i] == 0 ){
-				count++;
-			}
-		}
-		// Si el total es de 4 aristas rojas, se rompe el ciclo.
-		if(count == 4){
-			find = false;
-			break;
-		}
-		// Caso contrario, se repite el proceso 'cruz_roja'.
-		Serial.println("¡Repetir el proceso cruz_roja!");
-		verify(grid, pos);
-		cruz_roja(grid, pos);
-	// En caso de 'find == true', se ejecutará nuevamente el código.	
-	} while(find);
-
-	// Paso 6: Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).
-	Serial.println("Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).");
-	int rep = 0;
-	count = 0;
-	// Iterar hasta haber desplazado 4 aristas.
-	while(rep < 4){
-		// Explorar las caras laterales.
-		for(int c=1; c<5; c++){
-			// Buscar aristas en la hilera inferior que coincidan con el color del centro de la cara.
-			if( grid[c*9 + 7] == c && grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
-				giro_horario(grid, pos, c);
-				giro_horario(grid, pos, c);
-				rep++;
-				count++;
-				if(count > 12){
-					Serial.println("¡Error en Paso A.6!");
-					break;
-				}
-			}
-		}
-		// Girar la cara Naranja (5) y continuar el ciclo hasta haber desplazado 4 aristas.
-		giro_horario(grid, pos, 5);
-	}
-
-// Parte B: Esquinas de la cara Roja (0).
-	Serial.println("Parte B: Esquinas de la cara Roja.");
-
 	// Paso 1: Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.
 	Serial.println("Paso 1. Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.");
 	revision_superior(grid, pos);
@@ -742,7 +686,79 @@ void solve(int* grid, int* pos){
 		}
 	// En caso de 'find == true', se ejecutará nuevamente el código.
 	} while(find);
+}
 
+// Función para resolver el cubo.
+void solve(int* grid, int* pos){
+	
+// Parte A: Colocar la cruz roja.
+	bool find;
+	int count;
+  	Serial.println("Parte A. Cruz roja.");
+	cruz_roja(grid, pos);
+
+	// Contención de errores: Si no se encuentran 4 aristas rojas en la cara Naranja (5), se repite el proceso 'cruz_roja'.
+	do{
+		find = true;
+		count = 0;
+		// Contar el número de aristas rojas en la cara Naranja (5).
+		for(int i = 0; i<4; i++){
+			if( grid[5*9 + 1 + 2*i] == 0 ){
+				count++;
+			}
+		}
+		// Si el total es de 4 aristas rojas, se rompe el ciclo.
+		if(count == 4){
+			find = false;
+			break;
+		}
+		// Caso contrario, se repite el proceso 'cruz_roja'.
+		Serial.println("¡Repetir el proceso cruz_roja!");
+		verify(grid, pos);
+		cruz_roja(grid, pos);
+	// En caso de 'find == true', se ejecutará nuevamente el código.	
+	} while(find);
+
+	// Paso 6: Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).
+	Serial.println("Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).");
+	int rep = 0;
+	count = 0;
+	// Iterar hasta haber desplazado 4 aristas.
+	while(rep < 4){
+		// Explorar las caras laterales.
+		for(int c=1; c<5; c++){
+			// Buscar aristas en la hilera inferior que coincidan con el color del centro de la cara.
+			if( grid[c*9 + 7] == c && grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
+				giro_horario(grid, pos, c);
+				giro_horario(grid, pos, c);
+				rep++;
+				count++;
+				if(count > 12){
+					Serial.println("¡Error en Paso A.6!");
+					break;
+				}
+			}
+		}
+		// Girar la cara Naranja (5) y continuar el ciclo hasta haber desplazado 4 aristas.
+		giro_horario(grid, pos, 5);
+	}
+
+// Parte B: Esquinas de la cara Roja (0).
+	Serial.println("Parte B: Esquinas de la cara Roja.");
+	do{
+		find = false;
+		esquinas_cara_roja(grid, pos);
+		// Verificar si alguna esquina de la cara roja es de un color distinto.
+		for(int i=1; i<5; i++){
+			if( grid[ 2*i + ((i<3) ? -2 : 0) ] != 0 ){
+				// En caso de encontrar una esquina errónea, repite el proceso 'esquinas_cara_roja'.
+				Serial.println("¡Repetir proceso esquinas_cara_roja!");
+				find = true;
+				break;
+			}
+		}
+	} while(find);
+	
 	// Verificación.
 	verify(grid, pos);
 	
@@ -764,7 +780,7 @@ void setup() {
   	pinMode(p2, INPUT);
  	pinMode(p3, INPUT);
  	pinMode(p4, INPUT);
-    	pinMode(p5, INPUT);
+	pinMode(p5, INPUT);
    	pinMode(p6, INPUT);
 	pinMode(p7, INPUT);
   

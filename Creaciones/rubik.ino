@@ -907,7 +907,8 @@ void loop() {
       // Detener hasta soltar el botón.
       while( digitalRead(p7) == LOW ){
         giro_aleatorio(grid_ptr, pos_ptr);
-      };
+	delay(75);      
+      }
     }
   }
 }

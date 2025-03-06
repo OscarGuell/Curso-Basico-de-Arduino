@@ -730,8 +730,8 @@ void colocar_arista_inferior(int* grid, int* pos, int c){
 	int K = (c+2) % 4 + 1;
 	// Variable auxiliar para condensar el código.
 	bool state = grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == F;
-	// Caso 01 (state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral siguiente (F).
-	// Caso 02 (!state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral anterior (K).
+	// Caso #1 (state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral siguiente (F).
+	// Caso #2 (!state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral anterior (K).
 	selec_giro(grid, pos, 5, !state);
 	selec_giro(grid, pos, state ? F : K, !state);
 	selec_giro(grid, pos, 5, state);
@@ -740,6 +740,22 @@ void colocar_arista_inferior(int* grid, int* pos, int c){
 	selec_giro(grid, pos, c, state);
 	selec_giro(grid, pos, 5, !state);
 	selec_giro(grid, pos, c, !state);
+}
+
+
+
+void mover_naranja(int* grid, int* pos, int c, int N){
+	// K: Cara lateral anterior.
+	int K = (c+2) % 4 + 1;
+	giro_horario(grid, pos, c);
+	// Repetir el movimiento 'N' veces.
+	for(int i=0; i < N; i++){
+		giro_horario(grid, pos, K);
+		giro_horario(grid, pos, 5);
+		giro_antihorario(grid, pos, K);
+		giro_antihorario(grid, pos, 5);
+	}
+	giro_antihorario(grid, pos, c);
 }
 
 
@@ -858,7 +874,7 @@ void solve(int* grid, int* pos){
 			}
 		}
 	} while(find);
-
+	Serial.println("Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.");
 	// Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.
 	do{
 		find = false;
@@ -896,7 +912,36 @@ void solve(int* grid, int* pos){
 			}
 		}
 	} while(find);
-	
+
+// Parte D. Cruz naranja.
+	Serial.println("Parte D: Cruz naranja.");
+	Serial.println("Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja.");
+	// Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja (5).
+	count = 0;
+	// Contar el número de aristas naranjas en la cara Naranja (5).
+	for(int i=0; i<4; i++){
+		if( grid[5*9 + 2*i + 1] == 5 ){
+			count++;
+		}
+	}
+	// Caso #1: Ninguna arista naranja.
+	if(count == 0){
+		mover_naranja(grid, pos, 1, 2);
+		mover_naranja(grid, pos, 2, 1);
+	} else if(count == 2){
+		// Caso #2: Dos aristas naranjas intercaladas.
+		if( (grid[5*9 + 1] == 5 && grid[5*9 + 7] == 5) || (grid[5*9 + 3] == 5 && grid[5*9 + 5] == 5) ){
+			mover_naranja(grid, pos, ((grid[5*9 + 1] == 5) ? 1 : 2), 1);
+		// Caso #3: Dos aristas naranjas contiguas.
+		} else if{
+			// Orientar la cara naranja en la posición deseada.
+			while( grid[5*9 + 1] != 5 && grid[5*9 + 5] != 5 ){
+				giro_horario(grid, pos, 5);
+			}
+			mover_naranja(grid, pos, 1, 2);
+		}
+		
+	}
 }
 
 

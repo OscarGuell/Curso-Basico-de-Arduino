@@ -496,6 +496,20 @@ void cruz_roja(int* grid, int* pos){
 	}
 }
 
+void verify(int* grid, int* pos){
+	// Verificación.
+	for(int c=0; c<6; c++){
+		for(int i=0; i<9; i++){
+			if( grid[c*9 + i] == 0 ){
+				Serial.print("Rojo en cara ");
+				Serial.print(c);
+				Serial.print(", pos ");
+				Serial.println(i);
+			}
+		}
+	}
+}
+
 // Función para resolver el cubo.
 void solve(int* grid, int* pos){
 	
@@ -520,7 +534,8 @@ void solve(int* grid, int* pos){
 				break;
 			}
 			// Caso contrario, se repite el proceso 'cruz_roja'.
-			Serial.println("¡Repetir el proceso cruz_roja!")
+			Serial.println("¡Repetir el proceso cruz_roja!");
+			verify(grid, pos);
 			cruz_roja(grid, pos);
 		}
 	} while(find);
@@ -528,7 +543,7 @@ void solve(int* grid, int* pos){
 	// Paso 6: Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).
 	Serial.println("Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).");
 	int rep = 0;
-	int count = 0;
+	count = 0;
 	// Iterar hasta haber desplazado 4 aristas.
 	while(rep < 4){
 		// Explorar las caras laterales.
@@ -562,7 +577,6 @@ void solve(int* grid, int* pos){
 
 	// Paso 3: Buscar 'rojo' (0) en la esquina inferior izquierda de cada cara lateral.
 	Serial.println("Paso 3: Buscar 'rojo' en la esquina inferior izquierda de cada cara lateral.");
-	bool find;
 	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 6] == 0', se repetirá la ejecución del bloque.
 	do{
 		find = false;
@@ -664,16 +678,7 @@ void solve(int* grid, int* pos){
 	} while(find);
 
 	// Verificación.
-	for(int c=0; c<6; c++){
-		for(int i=0; i<9; i++){
-			if( grid[c*9 + i] == 0 ){
-				Serial.print("Rojo en cara ");
-				Serial.print(c);
-				Serial.print(", pos ");
-				Serial.println(i);
-			}
-		}
-	}
+	verify(grid, pos);
 	
 
 // Parte C: Aristas intermedias.

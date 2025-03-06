@@ -465,39 +465,89 @@ void cruz_roja(int* grid, int* pos){
 	
 	// Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral (1-4).
 	Serial.println("Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral.");
-	for(int c=1; c<5; c++){
-		hilera_superior_cara_lateral(grid, pos, c);
-	}
+	do{
+		find = false;
+		for(int c=1; c<5; c++){
+			hilera_superior_cara_lateral(grid, pos, c);
+		}
+		// Verificación.
+		for(int c=1; c<5; c++){
+			if( grid[c*9 + 1] == 0 ){
+				Serial.println("¡Repetir Paso 02!");
+				find = true;
+				break;
+			}
+		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.
+	} while(find);
+	
 
 	// Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral (1-4).
 	Serial.println("Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral.");
-	for(int c=1; c<5; c++){
-		lado_izquierdo_cara_lateral(grid, pos, c);
-	}
+	do{
+		find = false;
+		for(int c=1; c<5; c++){
+			lado_izquierdo_cara_lateral(grid, pos, c);
+		}
+		// Verificación.
+		for(int c=1; c<5; c++){
+			if( grid[c*9 + 3] == 0 ){
+				Serial.println("¡Repetir Paso 03!");
+				find = true;
+				break;
+			}
+		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.
+	} while(find);
+	
 
 	// Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral (1-4).
 	Serial.println("Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral.");
-	for(int c=1; c<5; c++){
-		lado_derecho_cara_lateral(grid, pos, c);
-	}
+	do{
+		find = false;
+		for(int c=1; c<5; c++){
+			lado_derecho_cara_lateral(grid, pos, c);
+		}
+		// Verificación.
+		for(int c=1; c<5; c++){
+			if( grid[c*9 + 5] == 0 ){
+				Serial.println("¡Repetir Paso 04!");
+				find = true;
+				break;
+			}
+		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.
+	} while(find);
 
 	// Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral (1-4).
 	Serial.println("Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral.");
-	for(int c=1; c<5; c++){
-		// Detectar si hay una arista roja en la hilera inferior de la cara 'c'.
-		if( grid[c*9 + 7] == 0 ){
-			// Algoritmo para colocar la arista roja en la cara Naranja (5) aprovechando el espacio generado por la arista encontrada.
-			giro_antihorario(grid, pos, c);
-			giro_horario(grid, pos, 5);
-			giro_antihorario(grid, pos, c % 4 + 1);
-			// Regresar la cara Naranja (5) a su posición original, para evitar problemas en la iteración.
-			giro_antihorario(grid, pos, 5);
+	do{
+		find = false;
+		for(int c=1; c<5; c++){
+			// Detectar si hay una arista roja en la hilera inferior de la cara 'c'.
+			if( grid[c*9 + 7] == 0 ){
+				// Algoritmo para colocar la arista roja en la cara Naranja (5) aprovechando el espacio generado por la arista encontrada.
+				giro_antihorario(grid, pos, c);
+				giro_horario(grid, pos, 5);
+				giro_antihorario(grid, pos, c % 4 + 1);
+				// Regresar la cara Naranja (5) a su posición original, para evitar problemas en la iteración.
+				giro_antihorario(grid, pos, 5);
+			}
 		}
-	}
+		// Verificación.
+		for(int c=1; c<5; c++){
+			if( grid[c*9 + 7] == 0 ){
+				Serial.println("¡Repetir Paso 05!");
+				find = true;
+				break;
+			}
+		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.
+	} while(find);
 }
 
 void verify(int* grid, int* pos){
-	// Verificación.
+	// Verificación de la posición de las piezas rojas.
 	for(int c=0; c<6; c++){
 		for(int i=0; i<9; i++){
 			if( grid[c*9 + i] == 0 ){
@@ -538,6 +588,7 @@ void solve(int* grid, int* pos){
 			verify(grid, pos);
 			cruz_roja(grid, pos);
 		}
+	// En caso de 'find == true', se ejecutará nuevamente el código.	
 	} while(find);
 
 	// Paso 6: Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).

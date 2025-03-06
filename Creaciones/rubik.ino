@@ -759,6 +759,20 @@ void mover_naranja(int* grid, int* pos, int c, int N){
 }
 
 
+// Función a emplear durante la alineación de aristas de la última cara.
+void permutar_aristas(int* grid, int* pos, int c){
+	giro_antihorario(grid, pos, c);
+	giro_antihorario(grid, pos, 5);
+	giro_horario(grid, pos, c);
+	giro_antihorario(grid, pos, 5);
+	giro_antihorario(grid, pos, c);
+	giro_antihorario(grid, pos, 5);
+	giro_antihorario(grid, pos, 5);
+	giro_horario(grid, pos, c);
+	giro_antihorario(grid, pos, 5);
+}
+
+
 
 // Función para resolver el cubo.
 void solve(int* grid, int* pos){
@@ -786,7 +800,6 @@ void solve(int* grid, int* pos){
 		}
 		// Caso contrario, se repite el proceso 'cruz_roja'.
 		Serial.println("Repetir el proceso cruz_roja");
-		verify(grid, pos);
 		cruz_roja(grid, pos);
 	// En caso de 'find == true', se ejecutará nuevamente el código.	
 	} while(find);
@@ -929,7 +942,7 @@ void solve(int* grid, int* pos){
 		mover_naranja(grid, pos, 1, 2);
 		mover_naranja(grid, pos, 2, 1);
 	} else if(count == 2){
-		// Caso #2: Dos aristas naranjas intercaladas.
+		// Caso #2: Dos aristas naranjas opuestas.
 		if( (grid[5*9 + 1] == 5 && grid[5*9 + 7] == 5) || (grid[5*9 + 3] == 5 && grid[5*9 + 5] == 5) ){
 			mover_naranja(grid, pos, ((grid[5*9 + 1] == 5) ? 1 : 2), 1);
 		// Caso #3: Dos aristas naranjas contiguas.
@@ -940,8 +953,61 @@ void solve(int* grid, int* pos){
 			}
 			mover_naranja(grid, pos, 1, 2);
 		}
-		
+	// Caso #4: Cuatro aristas naranjas (ninguna acción es necesaria).
 	}
+
+	// Paso 2: Alinear las aristas naranjas con las caras laterales.
+	Serial.println("Paso 2: Alinear las aristas naranjas con las caras laterales.");
+	// Contar la cantidad de aristas alineadas.
+	count = 0;
+	// Probar las cuatro orientaciones posibles de la cara naranja hasta encontrar dos o cuatro aristas alineadas.
+	for(int N=0; N < 4; N++){
+		// Revisar las cuatro caras laterales, contando el número de aristas alineadas.
+		// Si el número de aristas es menor a 2, se continúa iterando. En caso de ser 2 o 4, se ejecutan los casos posibles.
+		for(int c=1; c<5; c++){
+			if( grid[c*9 + 7] == c ){
+				count++;
+			}
+			// Caso #1: Cuatro aristas alineadas.
+			if(count == 4){
+				// En caso de encontrar una configuración donde estén las cuatro aristas alineadas, salta al siguiente paso.
+				goto loops_exit;
+			// Dos aristas alineadas.
+			} else if(count == 2){
+				// Caso #2: Dos aristas alineadas opuestas.
+				if( (grid[1*9 + 7] == 1 && grid[3*9 + 7] == 3) || (grid[2*9 + 7] == 2 && grid[4*9 + 7] == 4) ){
+					permutar_aristas(grid, pos, ((grid[1*9 + 7] == 1) ? 1 : 2));
+					permutar_aristas(grid, pos, ((grid[1*9 + 7] == 1) ? 4 : 1));
+					permutar_aristas(grid, pos, ((grid[1*9 + 7] == 1) ? 1 : 2));
+					// Continuar al siguiente paso.
+					goto loops_exit;
+				// Caso #3: Dos aristas alineadas contiguas.
+				} else{
+					int i;
+					i = 1;
+					do{
+						F = i % 4 + 1;
+						if( grid[i*9 + 7] == i && grid[F*9 + 7] == F ){
+							permutar_aristas(grid, pos, i);
+							// Continuar al siguiente paso.
+							goto loops_exit;
+						} else{
+							i++;
+						}
+						// Contención de errores.
+						if(i > 4){
+							Serial.println("Error fatal en el Paso D.2");
+							goto loops_exit;
+						}
+					} while(true);
+				}
+			}
+		}
+	}
+	// Línea a la que el código para continuar con el siguiente paso.
+	loops_exit;
+
+	
 }
 
 

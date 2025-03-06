@@ -359,6 +359,7 @@ void subir_esquina_derecha(int* grid, int* pos, int c){
 	giro_antihorario(grid, pos, c%4+1);
 	giro_horario(grid, pos, 5);
 	giro_horario(grid, pos, c%4+1);
+	
 }
 
 void selec_giro(int* grid, int* pos, int c, bool state){

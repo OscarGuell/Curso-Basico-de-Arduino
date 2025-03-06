@@ -63,24 +63,24 @@ void giro_horario(int* grid,  int* p, int eje) {
   int aux[3];
   
   // Parte A: Caras laterales.
-  	int K, F, c1, c2;
+  	int L, M, c1, c2;
 	// Caso #1: Cara roja (0) o naranja (5).
 	if (eje == 0 || eje == 5) {
-		K = ((eje == 0) ? 1 : 4);
+		L = ((eje == 0) ? 1 : 4);
 		// Respaldar los valores de la primera cara (1 o 4) en un array auxiliar.
 		for (int i = 0; i < 3; i++) {
-			aux[i] = grid[K*9 + i];
+			aux[i] = grid[L*9 + ((eje == 0) ? i : 8-i)];
 		}
 		// Sobreescribir la cara actual con los valores de la siguiente cara.
 		for (int c = 1; c < 4; c++) {
-			F = ((eje == 0) ? c : 5-c);
+			M = ((eje == 0) ? c : 5-c);
 			for (int i = 0; i < 3; i++) {
-				grid[F*9 + i] = grid[ (F + ((eje == 0) ? 1 : -1) ) * 9 + i ];
+				grid[M*9 + ((eje == 0) ? i : 8-i)] = grid[ (M + ((eje == 0) ? 1 : -1) )*9 + ((eje == 0) ? i : 8-i) ];
 			}
 		}
 		// Asignar los valores guardados a la última cara (4 o 1).
 		for (int i = 0; i < 3; i++) {
-			grid[ (5-K)*9 + i ] = aux[i];
+			grid[ (5-L)*9 + ((eje == 0) ? i : 8-i) ] = aux[i];
 		}
 
 	// Caso #2: Azul (1), Blanco (2), Verde(3) o Amarillo (4).

@@ -57,6 +57,8 @@ int p7 = 10;
 int *grid_ptr;
 int *pos_ptr;
 
+
+
 // Función para realizar un giro horario.
 void giro_horario(int* grid,  int* p, int eje) {
 
@@ -143,6 +145,7 @@ void giro_horario(int* grid,  int* p, int eje) {
 }
 
 
+
 // Función para realizar un giro antihorario.
 void giro_antihorario(int* grid, int* p, int eje) {
 
@@ -227,6 +230,7 @@ void giro_antihorario(int* grid, int* p, int eje) {
 }
 
 
+
 void hilera_superior_cara_lateral(int* grid, int* pos, int c){
 	// Detectar si hay una arista roja en la hilera superior de la cara 'c'.
 	if( grid[c*9 + 1] == 0 ){
@@ -260,6 +264,8 @@ void hilera_superior_cara_lateral(int* grid, int* pos, int c){
 		}
 	}
 }
+
+
 
 void lado_izquierdo_cara_lateral(int* grid, int* pos, int c){
 	// K: Cara lateral anterior.
@@ -295,6 +301,8 @@ void lado_izquierdo_cara_lateral(int* grid, int* pos, int c){
 	} 
 }
 
+
+
 void lado_derecho_cara_lateral(int* grid, int* pos, int c){
 	// F: Cara lateral siguiente.
 	int F = c % 4 + 1;
@@ -316,6 +324,8 @@ void lado_derecho_cara_lateral(int* grid, int* pos, int c){
 		}
 	}
 }
+
+
 
 void esquinas_rojas_cara_naranja(int* grid, int* pos){
 	int c;
@@ -348,12 +358,16 @@ void esquinas_rojas_cara_naranja(int* grid, int* pos){
 	}
 }
 
+
+
 void subir_esquina_izquierda(int* grid, int* pos, int c){
 	giro_horario(grid, pos, 5);
 	giro_horario(grid, pos, (c+2)%4+1);
 	giro_antihorario(grid, pos, 5);
 	giro_antihorario(grid, pos, (c+2)%4+1);
 }
+
+
 
 void subir_esquina_derecha(int* grid, int* pos, int c){
 	giro_antihorario(grid, pos, 5);
@@ -363,6 +377,8 @@ void subir_esquina_derecha(int* grid, int* pos, int c){
 	
 }
 
+
+
 void selec_giro(int* grid, int* pos, int c, bool state){
 	if(state == true){
 		giro_horario(grid, pos, c);
@@ -370,6 +386,8 @@ void selec_giro(int* grid, int* pos, int c, bool state){
 		giro_antihorario(grid, pos, c);
 	}
 }
+
+
 
 void esquina_roja_hilera_inferior_izquierda(int* grid, int* pos, int c){
 	int K = c;
@@ -391,6 +409,8 @@ void esquina_roja_hilera_inferior_izquierda(int* grid, int* pos, int c){
 	}
 }
 
+
+
 void esquina_roja_hilera_inferior_derecha(int* grid, int* pos, int c){
 	int F = c;
 	bool find;
@@ -410,6 +430,8 @@ void esquina_roja_hilera_inferior_derecha(int* grid, int* pos, int c){
 		subir_esquina_derecha(grid, pos, (F+2)%4+1);
 	}
 }
+
+
 
 void revision_superior(int* grid, int* pos){
 	int R;
@@ -440,11 +462,15 @@ void revision_superior(int* grid, int* pos){
 	} while(find);
 }
 
+
+
 void giro_aleatorio(int* grid, int* pos){
   	int c = random(0,6);
   	bool f = random(0,2);
 	selec_giro(grid, pos, c, f);
 }
+
+
 
 void cruz_roja(int* grid, int* pos){
 	bool find;
@@ -547,6 +573,8 @@ void cruz_roja(int* grid, int* pos){
 	} while(find);
 }
 
+
+
 void verify(int* grid, int* pos){
 	// Verificación de la posición de las piezas rojas.
 	for(int c=0; c<6; c++){
@@ -560,6 +588,8 @@ void verify(int* grid, int* pos){
 		}
 	}
 }
+
+
 
 void esquinas_cara_roja(int* grid, int* pos){
 	bool find;
@@ -619,7 +649,9 @@ void esquinas_cara_roja(int* grid, int* pos){
 		for(int c=1; c<5; c++){
 			// Detectar si la esquina inferior de la cara 'c' es roja.
 			if( grid[c*9 + 8] == 0 ){
+				Serial.println("Repetir Paso B.5");
 				find = true;
+				break;
 			}
 		}
 	// En caso de 'find == true', se ejecutará nuevamente el código.
@@ -681,19 +713,43 @@ void esquinas_cara_roja(int* grid, int* pos){
 		// Verificar si es necesario repetir el bloque de código.
 		for(int c=1; c<5; c++){
 			if( grid[c*9] == 0 || grid[c*9 + 2] == 0){
+				Serial.println("Repetir Paso B.5");
 				find = true;
+				break;
 			}
 		}
 	// En caso de 'find == true', se ejecutará nuevamente el código.
 	} while(find);
 }
 
+
+
+void colocar_arista_inferior(int* grid, int* pos, int c){
+	// F: Cara lateral siguiente; K: Cara lateral anterior.
+	int F = c % 4 + 1;
+	int K = (c+2) % 4 + 1;
+	// Variable auxiliar para condensar el código.
+	bool state = grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == F;
+	// Caso 01 (state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral siguiente (F).
+	// Caso 02 (!state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral anterior (K).
+	selec_giro(grid, pos, 5, !state);
+	selec_giro(grid, pos, state ? F : K, !state);
+	selec_giro(grid, pos, 5, state);
+	selec_giro(grid, pos, state ? F : K, state);
+	selec_giro(grid, pos, 5, state);
+	selec_giro(grid, pos, c, state);
+	selec_giro(grid, pos, 5, !state);
+	selec_giro(grid, pos, c, !state);
+}
+
+
+
 // Función para resolver el cubo.
 void solve(int* grid, int* pos){
 	
 // Parte A: Colocar la cruz roja.
 	bool find;
-	int count;
+	int count, R;
   	Serial.println("Parte A. Cruz roja.");
 	cruz_roja(grid, pos);
 
@@ -713,7 +769,7 @@ void solve(int* grid, int* pos){
 			break;
 		}
 		// Caso contrario, se repite el proceso 'cruz_roja'.
-		Serial.println("¡Repetir el proceso cruz_roja!");
+		Serial.println("Repetir el proceso cruz_roja");
 		verify(grid, pos);
 		cruz_roja(grid, pos);
 	// En caso de 'find == true', se ejecutará nuevamente el código.	
@@ -734,7 +790,7 @@ void solve(int* grid, int* pos){
 				rep++;
 				count++;
 				if(count > 12){
-					Serial.println("¡Error en Paso A.6!");
+					Serial.println("Error en Paso A.6");
 					break;
 				}
 			}
@@ -752,7 +808,7 @@ void solve(int* grid, int* pos){
 		for(int i=1; i<5; i++){
 			if( grid[ 2*i + ((i<3) ? -2 : 0) ] != 0 ){
 				// En caso de encontrar una esquina errónea, repite el proceso 'esquinas_cara_roja'.
-				Serial.println("¡Repetir proceso esquinas_cara_roja!");
+				Serial.println("Repetir proceso esquinas_cara_roja");
 				find = true;
 				break;
 			}
@@ -765,6 +821,81 @@ void solve(int* grid, int* pos){
 
 // Parte C: Aristas intermedias.
 	Serial.println("Parte C: Aristas intermedias.");
+	Serial.println("Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral.");
+	// Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral.
+	bool check;
+	do{
+		find = false;
+		for(int c=1; c<5; c++){
+			// Revisar ambos costados de la arista ubicada en la hilera inferior de la cara 'c'.
+			if( grid[c*9 + 7] != 5 && grid[5*9 + ((c<3) ? 5-2*c : 2*c-1) ] != 5 ){
+				// R: Variable auxiliar.
+				R = c;
+				// Repetir el ciclo hasta que la arista inferior coincida con la cara correspondiente.
+				do{
+					check = false;
+					if( grid[R*9 + 7] == R ){
+						check = true;
+						break;
+					} else{
+						// Actualizar 'R' a la cara lateral siguiente.
+						R = R % 4 + 1;
+						giro_horario(grid, pos, 5);
+					}
+				} while(check);
+				// Colocar la arista en su posición correcta.
+				colocar_arista_inferior(grid, pos, R);
+			}
+		}
+
+		// Verificación.
+		for(int c=1; c<5; c++){
+			// Repetir el bloque de código en caso de encontrar una arista restante.
+			if( grid[c*9 + 7] != 5 && grid[5*9 + ((c<3) ? 5-2*c : 2*c-1) ] != 5 ){
+				Serial.println("Repetir Paso C.1");
+				find = true;
+				break;
+			}
+		}
+	} while(find);
+
+	// Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.
+	do{
+		find = false;
+		for(int c=1; c<5; c++){
+			// Detectar si la arista derecha es del color de la cara lateral siguiente.
+			if( grid[c*9 + 5] == c%4+1 && grid[(c%4+1)*9 + 3] == c ){
+				// F: Cara lateral siguiente.
+				F = c % 4 + 1;
+				// Retirar la pieza de su posición.
+				giro_antihorario(grid, pos, F);
+				giro_horario(grid, pos, 5);
+				giro_horario(grid, pos, F);
+				giro_horario(grid, pos, 5);
+				giro_horario(grid, pos, c);
+				giro_antihorario(grid, pos, 5);
+				giro_antihorario(grid, pos, c);
+				// Colocarla nuevamente, con la orientación corregida.
+				giro_horario(grid, pos, 5);
+				giro_antihorario(grid, pos, F);
+				giro_horario(grid, pos, 5);
+				giro_horario(grid, pos, F);
+				giro_horario(grid, pos, 5);
+				giro_horario(grid, pos, c);
+				giro_antihorario(grid, pos, 5);
+				giro_antihorario(grid, pos, c);
+			}
+		}
+
+		// Verificación.
+		for(int c=1; c<5; c++){
+			if( grid[c*9 + 5] == c%4+1 && grid[(c%4+1)*9 + 3] == c ){
+				Serial.println("Repetir Paso C.2");
+				find = true;
+				break;
+			}
+		}
+	} while(find);
 	
 }
 

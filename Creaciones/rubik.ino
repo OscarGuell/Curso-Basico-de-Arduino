@@ -42,22 +42,38 @@
  */
 
 #include <math.h>
+#include <SoftwareSerial.h>
+#include <Servo.h>
+
+// Pines para la comunicación con el módulo Bluetooth | (RX, TX).
+SoftwareSerial Bluetooth(10, 11);
 
 // Declaración de pines.
-byte p0 = 2;
-byte p1 = 3;
-byte p2 = 4;
-byte p3 = 5;
-byte p4 = 6;
-byte p5 = 7;
-byte p6 = 9;
-byte p7 = 10;
+byte srvP0 = 2;
+byte srvP1 = 3;
+byte srvP2 = 4;
+byte srvP3 = 5;
+byte srvP4 = 6;
+byte srvP5 = 7;
+byte plsd = 9;
 
-// Punteros recursivos.
+// Declaración de Servomotores.
+Servo servo0;
+Servo servo1;
+Servo servo2;
+Servo servo3;
+Servo servo4;
+Servo servo5;
+Servo servos[6];
+
+// Punteros auxiliares.
 byte *grid_ptr;
 byte *pos_ptr;
+byte *servos_ptr;
 
-
+// Variables para la lectura de comandos por Bluetooth.
+bool selec;
+char reader;
 
 // Función para realizar un giro horario.
 void giro_horario(byte* grid,  byte* p, byte eje) {
@@ -137,11 +153,18 @@ void giro_horario(byte* grid,  byte* p, byte eje) {
 			grid[eje * 9 + j * 3 + (2 - i)] = temp[i * 3 + j];
 		}
 	}
-    
+
+	// Imprimir en la pantalla Serial el movimiento realizado.
   	Serial.print(F("Giro horario. Cara "));
   	Serial.print(eje);
   	Serial.println(F("."));
-  
+
+	// Realizar el giro en el servomotor correspondiente.
+	servos[eje].attach(140);
+	// Girar durante 150ms.
+	delay(150);
+	// Detener el giro.
+	servos[eje].attach(90);
 }
 
 
@@ -224,9 +247,17 @@ void giro_antihorario(byte* grid, byte* p, byte eje) {
 		}
 	}
 
+	// Imprimir en la pantalla Serial el movimiento realizado.
 	Serial.print(F("Giro antihorario. Cara "));
 	Serial.print(eje);
 	Serial.println(F("."));
+
+	// Realizar el giro en el servomotor correspondiente.
+	servos[eje].attach(40);
+	// Girar durante 150ms.
+	delay(150);
+	// Detener el giro.
+	servos[eje].attach(90);
 }
 
 
@@ -1147,141 +1178,107 @@ void solve(byte* grid, byte* pos){
 
 void setup() {
   
-  	// Configurar pulsadores.
-  	pinMode(p0, INPUT);
-  	pinMode(p1, INPUT);
-  	pinMode(p2, INPUT);
- 	pinMode(p3, INPUT);
- 	pinMode(p4, INPUT);
-	pinMode(p5, INPUT);
-   	pinMode(p6, INPUT);
-	pinMode(p7, INPUT);
+  	// Configurar pulsador.
+	pinMode(plsd, INPUT);
+	
+	// Configurar servomotores.
+	servo0.attach(srvP0);
+	servo1.attach(srvP1);
+	servo2.attach(srvP2);
+	servo3.attach(srvP3);
+	servo4.attach(srvP4);
+	servo5.attach(srvP5);
   
-    // Inicializar la pantalla serial para visualización del usuario.
-    Serial.begin(9600);
+  	// Inicializar la pantalla serial para visualización del usuario.
+   	Serial.begin(9600);
+	// Inicializar la lectura de datos desde el puerto Bluetooth.
+	Bluetooth.begin(9600);
+
+	// Arreglo con los pines conectados a los servomotores.
+	servos = {servo0, servo1, servo2, servo3, servo4, servo5};
   
-    // Generar cubo rubik.
-    static byte grid[9*6];
-    // Rellenar colores: Rojo (0) - Azul (1) - Blanco (2) - Verde (3) - Amarillo (4) - Naranja (5).
-    for (byte c = 0; c < 6; c++) {
-        for (byte i = 0; i < 9; i++) {
-            grid[c * 9 + i] = c;
-        }
-    }
+    	// Generar cubo rubik.
+ 	static byte grid[9*6];
+   	// Rellenar colores: Rojo (0) - Azul (1) - Blanco (2) - Verde (3) - Amarillo (4) - Naranja (5).
+   	for (byte c = 0; c < 6; c++) {
+      		for (byte i = 0; i < 9; i++) {
+       			grid[c * 9 + i] = c;
+       		}
+   	}
 
-    // Lista de posiciones relativas para un giro horario <0,C1,5,C2>.
-    static byte pos[12 * 4]{
-    	2, 5, 8,  2, 5, 8,  6, 3, 0,  0, 3, 6,  // eje == 1 (fila 0).
-	0, 1, 2,  2, 5, 8,  0, 1, 2,  6, 3, 0,  // eje == 2 (fila 1).
-	0, 3, 6,  8, 5, 2,  2, 5, 8,  6, 3, 0,  // eje == 3 (fila 2).
-	6, 7, 8,  8, 5, 2,  8, 7, 6,  0, 3, 6   // eje == 4 (fila 3).
-    };
+    	// Lista de posiciones relativas para un giro horario <0,C1,5,C2>.
+    	static byte pos[12 * 4]{
+		2, 5, 8,  2, 5, 8,  6, 3, 0,  0, 3, 6,  // eje == 1 (fila 0).
+		0, 1, 2,  2, 5, 8,  0, 1, 2,  6, 3, 0,  // eje == 2 (fila 1).
+		0, 3, 6,  8, 5, 2,  2, 5, 8,  6, 3, 0,  // eje == 3 (fila 2).
+		6, 7, 8,  8, 5, 2,  8, 7, 6,  0, 3, 6   // eje == 4 (fila 3).
+   	};
 
-    // Puntero a la grilla.
-    grid_ptr = grid;
-    // Puntero al arreglo de posiciones.
-    pos_ptr = pos;
+    	// Puntero a la grilla.
+    	grid_ptr = grid;
+    	// Puntero al arreglo de posiciones.
+    	pos_ptr = pos;
+
+	// Estado inicial de 'selec'.
+	selec = true;
 }
 
 void loop() {
+	
+	// Comprobar si hay datos disponibles desde el módulo Bluetooth.
+	if (Bluetooth.available() > 0) {
+		// Leer el comando enviado desde el Bluetooth.
+		reader = Bluetooth.read();
+		// Introducir todos los casos de comandos que brindemos al módulo.
+		switch(reader){
+			// Alternar tipo de giro ( Horario <-> Antihorario ). Predeterminado: Giro horario.
+			case 'a':
+				selec = !selec;
+				break;
+			// Giro en cara Roja (0).
+			case 'b':
+				selec_giro(grid_ptr, pos_ptr, 0, selec);
+				break;
+			// Giro en cara Azul (1).
+			case 'c':
+				selec_giro(grid_ptr, pos_ptr, 1, selec);
+				break;
+			// Giro en cara Blanca (2).
+			case 'd':
+				selec_giro(grid_ptr, pos_ptr, 2, selec);
+				break;
+			// Giro en cara Verde (3).
+			case 'e':
+				selec_giro(grid_ptr, pos_ptr, 3, selec);
+				break;
+			// Giro en cara Amarilla (4).
+			case 'f':
+				selec_giro(grid_ptr, pos_ptr, 4, selec);
+				break;
+			// Giro en cara Naranja (5).
+			case 'g':
+				selec_giro(grid_ptr, pos_ptr, 5, selec);
+				break;
+			// Resolver el cubo Rubik en el estado inicial dado.
+			case 'S':
+				solve(grid_ptr, pos_ptr);
+				break;
+			default:
+         			// Si el comando no es reconocido, no hacer nada.
+         			break;
+		}
+	}
   
-    // Pulsar el botón 'p0'.
-  if( digitalRead(p0) == LOW ){
-    // Verificar que 25ms después siga pulsado.
-    delay(25);
-    if( digitalRead(p0) == LOW){
-      // Giro horario en la cara '0' (Rojo).
-      giro_horario(grid_ptr, pos_ptr, 0);
-      // Detener hasta soltar el botón.
-      while( digitalRead(p0) == LOW );
-    }
-  }
-  
-  // Pulsar el botón 'p1'.
-  if( digitalRead(p1) == LOW ){
-    // Verificar que 25ms después siga pulsado.
-    delay(25);
-    if( digitalRead(p1) == LOW){
-      // Giro horario en la cara '1' (Azul).
-      giro_horario(grid_ptr, pos_ptr, 1);
-      // Detener hasta soltar el botón.
-      while( digitalRead(p1) == LOW );
-    }
-  }
-  
-  
-  // Pulsar el botón 'p2'.
-  if( digitalRead(p2) == LOW ){
-    // Verificar que 25ms después siga pulsado.
-    delay(25);
-    if( digitalRead(p2) == LOW){
-      // Giro horario en la cara '2' (Blanco).
-      giro_horario(grid_ptr, pos_ptr, 2);
-      // Detener hasta soltar el botón.
-      while( digitalRead(p2) == LOW );
-    }
-  }
-  
-  
-  // Pulsar el botón 'p3'.
-  if( digitalRead(p3) == LOW ){
-    // Verificar que 25ms después siga pulsado.
-    delay(25);
-    if( digitalRead(p3) == LOW){
-      // Giro horario en la cara '3' (Verde).
-      giro_horario(grid_ptr, pos_ptr, 3);
-      // Detener hasta soltar el botón.
-      while( digitalRead(p3) == LOW );
-    }
-  }
-  
-  
-  // Pulsar el botón 'p4'.
-  if( digitalRead(p4) == LOW ){
-    // Verificar que 25ms después siga pulsado.
-    delay(25);
-    if( digitalRead(p4) == LOW){
-      // Giro horario en la cara '4' (Amarillo).
-      giro_horario(grid_ptr, pos_ptr, 4);
-      // Detener hasta soltar el botón.
-      while( digitalRead(p4) == LOW );
-    }
-  }
-
-    
-  // Pulsar el botón 'p5'.
-  if( digitalRead(p5) == LOW ){
-    // Verificar que 25ms después siga pulsado.
-    delay(25);
-    if( digitalRead(p5) == LOW){
-      // Giro horario en la cara '5' (Azul).
-      giro_horario(grid_ptr, pos_ptr, 5);
-      // Detener hasta soltar el botón.
-      while( digitalRead(p5) == LOW );
-    }
-  }
-  
-  // Pulsar el botón 'p6'.
-  if( digitalRead(p6) == LOW ){
-    // Verificar que 150ms después siga pulsado.
-    delay(150);
-    if( digitalRead(p6) == LOW){
-      solve(grid_ptr, pos_ptr);
-      // Detener hasta soltar el botón.
-      while( digitalRead(p6) == LOW );
-    }
-  }
-  
-  // Pulsar el botón 'p7'.
-  if( digitalRead(p7) == LOW ){
-    // Verificar que 150ms después siga pulsado.
-    delay(150);
-    if( digitalRead(p7) == LOW){
-      // Detener hasta soltar el botón.
-      while( digitalRead(p7) == LOW ){
-        giro_aleatorio(grid_ptr, pos_ptr);
-	delay(75);      
-      }
-    }
-  }
+	// Pulsar el botón conectado al pin 'plsd'. Genera giros aleatorios.
+	if( digitalRead(plsd) == LOW ){
+		// Verificar que 150ms después siga pulsado.
+		delay(150);
+		// Detener hasta soltar el botón.
+	  	if( digitalRead(plsd) == LOW){
+			while( digitalRead(plsd) == LOW ){
+				giro_aleatorio(grid_ptr, pos_ptr);
+				delay(250);
+			}
+		}
+	}
 }

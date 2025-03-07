@@ -596,7 +596,7 @@ void verify(byte* grid, byte* pos, byte A){
 void esquinas_cara_roja(byte* grid, byte* pos){
 	bool find;
 	// Paso 1: Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.
-	Serial.println(F("Paso 1. Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta."));
+	Serial.println(F("Paso 1. Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientacion correcta, pero posicion incorrecta."));
 	revision_superior(grid, pos);
 	
 	// Paso 2: Buscar esquinas rojas en la cara Naranja (5).
@@ -777,26 +777,25 @@ void permutar_aristas(byte* grid, byte* pos, byte c){
 
 
 bool revisar_posicion(byte* grid, byte* pos, byte c){
+	// Revisar con base en la esquina inferior derecha de la cara.
 	byte count;
 	byte F = c % 4 + 1;
-	// Revisar con base en la esquina inferior derecha de cada cara lateral.
-	for(byte c=1; c<5; c++){
-		// Verificar si la esquina tiene el color de la cara actual.
-		if( grid[c*9 + 8] == c || grid[F*9 + 6] == c || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == c ){
-			count++;
-		}
-		// Verificar si la esquina tiene el color de la cara siguiente.
-		if( grid[c*9 + 8] == F || grid[F*9 + 6] == F || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == F ){
-			count++;
-		}
-		// En caso de encontrar ambos colores, sabemos que la esquina está en su posición.
-		if(count == 2){
-			return true;
-		} else{
-			return false;
-		}
+	// Verificar si la esquina tiene el color de la cara actual.
+	if( grid[c*9 + 8] == c || grid[F*9 + 6] == c || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == c ){
+		count++;
+	}
+	// Verificar si la esquina tiene el color de la cara siguiente.
+	if( grid[c*9 + 8] == F || grid[F*9 + 6] == F || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == F ){
+		count++;
+	}
+	// En caso de encontrar ambos colores, sabemos que la esquina está en su posición.
+	if(count == 2){
+		return true;
+	} else{
+		return false;
 	}
 }
+
 
 
 
@@ -867,6 +866,11 @@ void comprobar(byte* grid, byte* pos){
 
 // Función para resolver el cubo.
 void solve(byte* grid, byte* pos){
+
+	// Mostrar el estado inicial del cubo.
+	comprobar(grid, pos);
+	// Esperar 5 segundos antes de iniciar el algoritmo.
+	delay(5000);
 	
 // Parte A: Colocar la cruz roja.
 	bool find;
@@ -981,7 +985,7 @@ void solve(byte* grid, byte* pos){
 
 	comprobar(grid, pos);
 	
-	Serial.println(F("Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta."));
+	Serial.println(F("Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientacion incorrecta."));
 	// Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.
 	do{
 		find = false;
@@ -1023,7 +1027,7 @@ void solve(byte* grid, byte* pos){
 
 // Parte D. Cara naranja.
 	Serial.println(F("Parte D: Cruz naranja."));
-	Serial.println(F("Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja."));
+	Serial.println(F("Paso 1: Posibles casos para la orientacion de las aristas de la cara Naranja."));
 	// Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja (5).
 	count = 0;
 	// Contar el número de aristas naranjas en la cara Naranja (5).
@@ -1111,8 +1115,8 @@ void solve(byte* grid, byte* pos){
 
 	// Paso 3: Posición de las esquinas.
 	Serial.println(F("Paso 3: Posición de las esquinas."));
-	count = 0;
 	while(true){
+		count = 0;
 		// Revisar cuántas esquinas están en su posición correcta.
 		for(byte c=1; c<5; c++){
 			// Cada vez que encuentre una esquina en posición, suma al contador.
@@ -1143,10 +1147,8 @@ void solve(byte* grid, byte* pos){
 	// Paso 4: Orientación de las esquinas.
 	girar_esquinas(grid, pos);
 
-	Serial.println(F("¡Cubo resuelto!"));
-	for(byte c=0; c<6; c++){
-		verify(grid, pos, c);
-	}
+	Serial.println(F("Cubo resuelto!"));
+	comprobar(grid, pos);
 	
 }
 

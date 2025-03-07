@@ -576,7 +576,7 @@ void cruz_roja(byte* grid, byte* pos){
 
 
 void verify(byte* grid, byte* pos, byte A){
-	// Verificación de la posición de las piezas rojas.
+	// Verificación de la posición de las piezas color 'A'.
 	for(byte c=0; c<6; c++){
 		for(byte i=0; i<9; i++){
 			if( grid[c*9 + i] == A ){
@@ -731,7 +731,7 @@ void colocar_arista_inferior(byte* grid, byte* pos, byte c){
 	byte F = c % 4 + 1;
 	byte K = (c+2) % 4 + 1;
 	// Variable auxiliar para condensar el código.
-	bool state = grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == F;
+	bool state = (grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == F);
 	// Caso #1 (state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral siguiente (F).
 	// Caso #2 (!state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral anterior (K).
 	selec_giro(grid, pos, 5, !state);
@@ -844,6 +844,25 @@ void girar_esquinas(byte* grid, byte* pos){
 	}
 }
 
+void comprobar(byte* grid, byte* pos){
+	byte count;
+	for(byte c=0; c<6; c++){
+		count = 0;
+		Serial.print(F("--- Cara "));
+		Serial.print(c);
+		Serial.println(F(" ---"));
+		for(byte i=0; i<9; i++){
+			if(count == 2){
+				Serial.println(i);
+				count = 0;
+			} else{
+				Serial.print(i);
+				Serial.print(F(" "));
+				count++;
+			}
+		}
+	}
+}
 
 
 // Función para resolver el cubo.
@@ -920,8 +939,8 @@ void solve(byte* grid, byte* pos){
 	verify(grid, pos, 0);
 	
 
-// Parte C: Aristas del medio.
-	Serial.println(F("Parte C: Aristas del medio."));
+// Parte C: Aristas intermedias.
+	Serial.println(F("Parte C: Aristas intermedias."));
 	Serial.println(F("Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral."));
 	// Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral.
 	bool check;
@@ -959,16 +978,19 @@ void solve(byte* grid, byte* pos){
 			}
 		}
 	} while(find);
-	Serial.println(F("Paso 2: Buscar aristas del medio en la posición correcta, pero con orientación incorrecta."));
-	// Paso 2: Buscar aristas del medio en la posición correcta, pero con orientación incorrecta.
+
+	comprobar(grid, pos);
+	
+	Serial.println(F("Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta."));
+	// Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.
 	do{
 		find = false;
 		byte F;
 		for(byte c=1; c<5; c++){
-			// Detectar si la arista derecha es del color de la cara lateral siguiente.
-			if( grid[c*9 + 5] == c%4+1 && grid[(c%4+1)*9 + 3] == c ){
-				// F: Cara lateral siguiente.
-				F = c % 4 + 1;
+			// F: Cara lateral siguiente.
+			F = c % 4 + 1;
+			// Detectar si la arista derecha es del color de la cara lateral siguiente y viceversa.
+			if( grid[c*9 + 5] == F && grid[F*9 + 3] == c ){
 				// Retirar la pieza de su posición.
 				giro_antihorario(grid, pos, F);
 				giro_horario(grid, pos, 5);
@@ -1076,6 +1098,7 @@ void solve(byte* grid, byte* pos){
 				}
 			}
 		}
+		giro_horario(grid, pos, 5);
 	}
 	// Línea a la que el código para continuar con el siguiente paso.
 	loops_exit:

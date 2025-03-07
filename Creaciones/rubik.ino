@@ -798,7 +798,24 @@ bool revisar_posicion(int* grid, int* pos, int c){
 
 
 
-void permutar_esquinas(int* grid, int* pos, int c){}
+void permutar_esquinas(int* grid, int* pos, int c){
+	int F = c % 4 + 1;
+	int K = (c+2) % 4 + 1;
+	giro_antihorario(grid, pos, 5);
+	giro_antihorario(grid, pos, F);
+	giro_horario(grid, pos, 5);
+	giro_horario(grid, pos, K);
+	giro_antihorario(grid, pos, 5);
+	giro_horario(grid, pos, F);
+	giro_horario(grid, pos, 5);
+	giro_antihorario(grid, pos, K);
+}
+
+
+
+void girar_esquinas(int* grid, int* pos){
+	for(int c=1; c<5; c++){}
+}
 
 
 
@@ -1038,29 +1055,36 @@ void solve(int* grid, int* pos){
 	// Paso 3: Posición de las esquinas.
 	Serial.println("Paso 3: Orientación de las esquinas.");
 	count = 0;
-	// Revisar cuántas esquinas están en su posición correcta.
-	for(int c=1; c<5; c++){
-		// Cada vez que encuentre una esquina en posición, suma al contador.
-		if( revisar_esquina(grid, pos, c) == true ){
-			// En caso de ser la primera esquina en posición encontrada, reservarla.
-			if(count == 0){
-				N = c;
+	while(true){
+		// Revisar cuántas esquinas están en su posición correcta.
+		for(int c=1; c<5; c++){
+			// Cada vez que encuentre una esquina en posición, suma al contador.
+			if( revisar_esquina(grid, pos, c) == true ){
+				// En caso de ser la primera esquina en posición encontrada, reservarla.
+				if(count == 0){
+					N = c;
+				}
+				count++;
 			}
-			count++;
+		}
+		// Caso #1: Sólo una esquina en posición correcta (sin considerar orientación).
+		if(count == 1){
+			permutar_esquinas(grid, pos, N);
+		// Caso #2: Ninguna esquina en posición correcta.
+		} else if(count == 0){
+			permutar_esquinas(grid, pos, 1);
+		// Caso #3: Cuatro esquinas en posición (continuar al siguiente paso).
+		} else if(count == 4){
+			goto exit_loop;
 		}
 	}
-	// Caso #1: Sólo una esquina en posición correcta (sin considerar orientación).
-	if(count == 1){
-		permutar_esquinas(grid, pos, N);
-	// Caso #2: Ninguna esquina en posición correcta.
-	} else if(count == 0){
-		permutar_esquinas(grid, pos, 1);
-	}
-	// Caso #3: Cuatro esquinas en posición (continuar al siguiente paso).
+
+	exit_loop;
 
 	verify(grid, pos, 0);
 
 	// Paso 4: Orientación de las esquinas.
+	girar_esquinas(grid, pos);
 	
 }
 

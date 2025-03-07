@@ -853,10 +853,10 @@ void comprobar(byte* grid, byte* pos){
 		Serial.println(F(" ---"));
 		for(byte i=0; i<9; i++){
 			if(count == 2){
-				Serial.println(i);
+				Serial.println( grid[c*9 + i] );
 				count = 0;
 			} else{
-				Serial.print(i);
+				Serial.print( grid[c*9 + i] );
 				Serial.print(F(" "));
 				count++;
 			}
@@ -953,9 +953,9 @@ void solve(byte* grid, byte* pos){
 				R = c;
 				// Repetir el ciclo hasta que la arista inferior coincida con la cara correspondiente.
 				do{
-					check = false;
+					check = true;
 					if( grid[R*9 + 7] == R ){
-						check = true;
+						check = false;
 						break;
 					} else{
 						// Actualizar 'R' a la cara lateral siguiente.
@@ -1043,9 +1043,15 @@ void solve(byte* grid, byte* pos){
 		// Caso #3: Dos aristas naranjas contiguas.
 		} else{
 			// Orientar la cara naranja en la posición deseada.
-			while( grid[5*9 + 1] != 5 && grid[5*9 + 5] != 5 ){
+			do{
+				check = true;
+				if( grid[5*9 + 1] == 5 && grid[5*9 + 5] == 5 ){
+					check = false;
+					break;
+				}
 				giro_horario(grid, pos, 5);
-			}
+				
+			} while(check);
 			mover_naranja(grid, pos, 1, 2);
 		}
 	// Caso #4: Cuatro aristas naranjas (ninguna acción es necesaria).
@@ -1104,7 +1110,7 @@ void solve(byte* grid, byte* pos){
 	loops_exit:
 
 	// Paso 3: Posición de las esquinas.
-	Serial.println(F("Paso 3: Orientación de las esquinas."));
+	Serial.println(F("Paso 3: Posición de las esquinas."));
 	count = 0;
 	while(true){
 		// Revisar cuántas esquinas están en su posición correcta.
@@ -1128,6 +1134,7 @@ void solve(byte* grid, byte* pos){
 		} else if(count == 4){
 			// El ciclo 'while' únicamente se detendrá si 'count == 4'.
 			goto exit_loop;
+			break;
 		}
 	}
 

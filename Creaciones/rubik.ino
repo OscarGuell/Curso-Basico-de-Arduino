@@ -575,12 +575,14 @@ void cruz_roja(int* grid, int* pos){
 
 
 
-void verify(int* grid, int* pos, int C){
+void verify(int* grid, int* pos, int A){
 	// Verificación de la posición de las piezas rojas.
 	for(int c=0; c<6; c++){
 		for(int i=0; i<9; i++){
-			if( grid[c*9 + i] == C ){
-				Serial.print("Cara ");
+			if( grid[c*9 + i] == A ){
+				Serial.print("Color ");
+				Serial.print(A);
+				Serial.print(" en cara ");
 				Serial.print(c);
 				Serial.print(", pos ");
 				Serial.println(i);
@@ -814,7 +816,32 @@ void permutar_esquinas(int* grid, int* pos, int c){
 
 
 void girar_esquinas(int* grid, int* pos){
-	for(int c=1; c<5; c++){}
+	for(int c=1; c<5; c++){
+		// Primera posible rotación.
+		if( grid[1*9 + 6] != c){
+			giro_antihorario(grid, pos, 4);
+			giro_antihorario(grid, pos, 0);
+			giro_horario(grid, pos, 4);
+			giro_horario(grid, pos, 0);
+			giro_antihorario(grid, pos, 4);
+			giro_antihorario(grid, pos, 0);
+			giro_horario(grid, pos, 4);
+			giro_horario(grid, pos, 0);
+		}
+		// Segunda posible rotación.
+		if( grid[1*9 + 6] != c){
+			giro_antihorario(grid, pos, 4);
+			giro_antihorario(grid, pos, 0);
+			giro_horario(grid, pos, 4);
+			giro_horario(grid, pos, 0);
+			giro_antihorario(grid, pos, 4);
+			giro_antihorario(grid, pos, 0);
+			giro_horario(grid, pos, 4);
+			giro_horario(grid, pos, 0);
+		}
+		// Ir recorriendo las esquinas respectivas.
+		giro_antihorario(grid, pos, 5);
+	}
 }
 
 
@@ -1075,16 +1102,20 @@ void solve(int* grid, int* pos){
 			permutar_esquinas(grid, pos, 1);
 		// Caso #3: Cuatro esquinas en posición (continuar al siguiente paso).
 		} else if(count == 4){
+			// El ciclo 'while' únicamente se detendrá si 'count == 4'.
 			goto exit_loop;
 		}
 	}
 
 	exit_loop;
 
-	verify(grid, pos, 0);
-
 	// Paso 4: Orientación de las esquinas.
 	girar_esquinas(grid, pos);
+
+	Serial.println("¡Cubo resuelto!");
+	for(int c=0; c<6; c++){
+		verify(grid, pos, c);
+	}
 	
 }
 

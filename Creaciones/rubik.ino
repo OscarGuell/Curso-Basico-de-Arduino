@@ -844,22 +844,17 @@ void girar_esquinas(byte* grid, byte* pos){
 }
 
 void comprobar(byte* grid, byte* pos){
-	byte count;
-	for(byte c=0; c<6; c++){
-		count = 0;
-		Serial.print(F("--- Cara "));
-		Serial.print(c);
-		Serial.println(F(" ---"));
-		for(byte i=0; i<9; i++){
-			if(count == 2){
-				Serial.println( grid[c*9 + i] );
-				count = 0;
-			} else{
-				Serial.print( grid[c*9 + i] );
+	for(byte i=0; i<3; i++){
+		for(byte c=0; c<6; c++){
+			for(byte j=0; j<3; j++){
+				Serial.print( grid[c*9 + 3*i + j] );
 				Serial.print(F(" "));
-				count++;
+			}
+			if(c<5){
+				Serial.print(F("| "));
 			}
 		}
+		Serial.println("");
 	}
 }
 

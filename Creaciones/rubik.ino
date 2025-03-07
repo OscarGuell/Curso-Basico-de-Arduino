@@ -783,11 +783,11 @@ bool revisar_posicion(int* grid, int* pos, int c){
 	for(int c=1; c<5; c++){
 		// Verificar si la esquina tiene el color de la cara actual.
 		if( grid[c*9 + 8] == c || grid[F*9 + 6] == c || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == c ){
-			count++:
+			count++;
 		}
 		// Verificar si la esquina tiene el color de la cara siguiente.
 		if( grid[c*9 + 8] == F || grid[F*9 + 6] == F || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == F ){
-			count++:
+			count++;
 		}
 		// En caso de encontrar ambos colores, sabemos que la esquina está en su posición.
 		if(count == 2){
@@ -851,7 +851,7 @@ void solve(int* grid, int* pos){
 	
 // Parte A: Colocar la cruz roja.
 	bool find;
-	int count, R;
+	int count, R, F, N;
   	Serial.println("Parte A. Cruz roja.");
 	cruz_roja(grid, pos);
 
@@ -963,6 +963,7 @@ void solve(int* grid, int* pos){
 	// Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.
 	do{
 		find = false;
+		int F;
 		for(int c=1; c<5; c++){
 			// Detectar si la arista derecha es del color de la cara lateral siguiente.
 			if( grid[c*9 + 5] == c%4+1 && grid[(c%4+1)*9 + 3] == c ){
@@ -1018,7 +1019,7 @@ void solve(int* grid, int* pos){
 		if( (grid[5*9 + 1] == 5 && grid[5*9 + 7] == 5) || (grid[5*9 + 3] == 5 && grid[5*9 + 5] == 5) ){
 			mover_naranja(grid, pos, ((grid[5*9 + 1] == 5) ? 1 : 2), 1);
 		// Caso #3: Dos aristas naranjas contiguas.
-		} else if{
+		} else{
 			// Orientar la cara naranja en la posición deseada.
 			while( grid[5*9 + 1] != 5 && grid[5*9 + 5] != 5 ){
 				giro_horario(grid, pos, 5);
@@ -1077,7 +1078,7 @@ void solve(int* grid, int* pos){
 		}
 	}
 	// Línea a la que el código para continuar con el siguiente paso.
-	loops_exit;
+	loops_exit:
 
 	// Paso 3: Posición de las esquinas.
 	Serial.println("Paso 3: Orientación de las esquinas.");
@@ -1107,7 +1108,7 @@ void solve(int* grid, int* pos){
 		}
 	}
 
-	exit_loop;
+	exit_loop:
 
 	// Paso 4: Orientación de las esquinas.
 	girar_esquinas(grid, pos);

@@ -939,10 +939,6 @@ void solve(byte* grid, byte* pos){
 		}
 	} while(find);
 	
-	// Verificación.
-	verify(grid, pos, 0);
-	
-
 // Parte C: Aristas intermedias.
 	Serial.println(F("Parte C: Aristas intermedias."));
 	Serial.println(F("Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral."));
@@ -982,8 +978,6 @@ void solve(byte* grid, byte* pos){
 			}
 		}
 	} while(find);
-
-	comprobar(grid, pos);
 	
 	Serial.println(F("Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientacion incorrecta."));
 	// Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.
@@ -1063,10 +1057,10 @@ void solve(byte* grid, byte* pos){
 
 	// Paso 2: Alinear las aristas naranjas con las caras laterales.
 	Serial.println(F("Paso 2: Alinear las aristas naranjas con las caras laterales."));
-	// Contar la cantidad de aristas alineadas.
-	count = 0;
 	// Probar las cuatro orientaciones posibles de la cara naranja hasta encontrar dos o cuatro aristas alineadas.
 	for(byte N=0; N < 4; N++){
+		// Contar la cantidad de aristas alineadas.
+		count = 0;
 		// Revisar las cuatro caras laterales, contando el número de aristas alineadas.
 		// Si el número de aristas es menor a 2, se continúa iterando. En caso de ser 2 o 4, se ejecutan los casos posibles.
 		for(byte c=1; c<5; c++){

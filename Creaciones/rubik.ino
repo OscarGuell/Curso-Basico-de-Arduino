@@ -44,44 +44,44 @@
 #include <math.h>
 
 // Declaración de pines.
-int p0 = 2;
-int p1 = 3;
-int p2 = 4;
-int p3 = 5;
-int p4 = 6;
-int p5 = 7;
-int p6 = 9;
-int p7 = 10;
+byte p0 = 2;
+byte p1 = 3;
+byte p2 = 4;
+byte p3 = 5;
+byte p4 = 6;
+byte p5 = 7;
+byte p6 = 9;
+byte p7 = 10;
 
 // Punteros recursivos.
-int *grid_ptr;
-int *pos_ptr;
+byte *grid_ptr;
+byte *pos_ptr;
 
 
 
 // Función para realizar un giro horario.
-void giro_horario(int* grid,  int* p, int eje) {
+void giro_horario(byte* grid,  byte* p, byte eje) {
 
-  int aux[3];
+  byte aux[3];
   
   // Parte A: Caras laterales.
-  	int L, M, c1, c2;
+  	byte L, M, c1, c2;
 	// Caso #1: Cara roja (0) o naranja (5).
 	if (eje == 0 || eje == 5) {
 		L = ((eje == 0) ? 1 : 4);
 		// Respaldar los valores de la primera cara (1 o 4) en un array auxiliar.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			aux[i] = grid[L*9 + ((eje == 0) ? i : 8-i)];
 		}
 		// Sobreescribir la cara actual con los valores de la siguiente cara.
-		for (int c = 1; c < 4; c++) {
+		for (byte c = 1; c < 4; c++) {
 			M = ((eje == 0) ? c : 5-c);
-			for (int i = 0; i < 3; i++) {
+			for (byte i = 0; i < 3; i++) {
 				grid[M*9 + ((eje == 0) ? i : 8-i)] = grid[ (M + ((eje == 0) ? 1 : -1) )*9 + ((eje == 0) ? i : 8-i) ];
 			}
 		}
 		// Asignar los valores guardados a la última cara (4 o 1).
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			grid[ (5-L)*9 + ((eje == 0) ? i : 8-i) ] = aux[i];
 		}
 
@@ -93,30 +93,30 @@ void giro_horario(int* grid,  int* p, int eje) {
 		c2 = eje % 4 + 1;
 
 		// Paso 1: Respaldar los valores de la cara inicial (0) en 'aux'.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			aux[i] = grid[ p[ (eje - 1) * 12 + i] ];
 		}
 
 		// Paso 2: Actualizar '0'.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			// [0 <- c1].
 			grid[ p[ (eje - 1) * 12 + i + 3 * 0 ] ] = grid[ c1 * 9 + p[ (eje - 1) * 12 + i + 3 * 1 ] ];
 		}
 
 		// Paso 3: Actualizar 'C1'.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			// [c1 <- 5].
 			grid[ c1 * 9 + p[ (eje - 1) * 12 + ((eje == 3 || eje == 4) ? (2 - i) : i) + 3 * 1 ] ] = grid[ 5 * 9 + p[ (eje - 1) * 12 + i + 3 * 2 ] ];
 		}
 
 		// Paso 4: Actualizar '5'.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			// [5 <- c2].
 			grid[ 5 * 9 + p[ (eje - 1) * 12 + ((eje == 1 || eje == 4) ? (2 - i) : i) + 3 * 2] ] = grid[c2 * 9 + p[ (eje - 1) * 12 + i + 3 * 3] ];
 		}
 
 		// Paso 5: Usar 'aux' para actualizar la cara final (C2).
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			// [c2 <- aux].
 			// Última ronda, empleando los valores auxiliares.
 			grid[ c2 * 9 + p[ (eje - 1) * 12 + ((eje == 2 || eje == 3) ? (2 - i) : i) + 3 * 3 ] ] = aux[ ((eje == 1 || eje == 2) ? (2 - i) : i) ];
@@ -126,14 +126,14 @@ void giro_horario(int* grid,  int* p, int eje) {
   // Parte B: Rotación de la cara seleccionada.
 
 	// Respaldar los valores originales de la cara a rotar en un array temporal.
-	int temp[9];
-	for (int i = 0; i < 9; i++) {
+	byte temp[9];
+	for (byte i = 0; i < 9; i++) {
 		temp[i] = grid[eje * 9 + i];
 	}
 
 	// Aplicar la rotación A[i][j] -> A[j][2-i].
-	for (int j = 0; j < 3; j++) {
-		for (int i = 0; i < 3; i++) {
+	for (byte j = 0; j < 3; j++) {
+		for (byte i = 0; i < 3; i++) {
 			grid[eje * 9 + j * 3 + (2 - i)] = temp[i * 3 + j];
 		}
 	}
@@ -147,28 +147,28 @@ void giro_horario(int* grid,  int* p, int eje) {
 
 
 // Función para realizar un giro antihorario.
-void giro_antihorario(int* grid, int* p, int eje) {
+void giro_antihorario(byte* grid, byte* p, byte eje) {
 
-	int aux[3];
+	byte aux[3];
   
 	// Parte A: Caras laterales.
-	int L, M, c1, c2;
+	byte L, M, c1, c2;
 	// Caso #1: Cara roja (0) o naranja (5).
 	if (eje == 0 || eje == 5) {
 		L = ((eje == 0) ? 1 : 4);
 		// Respaldar los valores de la última cara (4 o 1) en un array auxiliar.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			aux[i] = grid[(5 - L) * 9 + ((eje == 0) ? i : 8 - i)];
 		}
 		// Sobreescribir la cara actual con los valores de la cara anterior.
-		for (int c = 4; c > 1; c--) {
+		for (byte c = 4; c > 1; c--) {
 			M = ((eje == 0) ? c : 5 - c);
-			for (int i = 0; i < 3; i++) {
+			for (byte i = 0; i < 3; i++) {
 				grid[M * 9 + ((eje == 0) ? i : 8 - i)] = grid[(M - ((eje == 0) ? 1 : -1)) * 9 + ((eje == 0) ? i : 8 - i)];
 			}
 		}
 		// Asignar los valores guardados a la primera cara (1 o 4).
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			grid[L * 9 + ((eje == 0) ? i : 8 - i)] = aux[i];
 		}
 
@@ -180,30 +180,30 @@ void giro_antihorario(int* grid, int* p, int eje) {
 		c2 = eje % 4 + 1;
 
 		// Paso 1: Respaldar los valores de la cara final (C2) en 'aux'.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			aux[i] = grid[c2 * 9 + p[(eje - 1) * 12 + ((eje == 2 || eje == 3) ? (2 - i) : i) + 3 * 3]];
 		}
 
 		// Paso 2: Actualizar 'C2'.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			// [c2 <- 5].
 			grid[c2 * 9 + p[(eje - 1) * 12 + ((eje == 1 || eje == 4) ? (2 - i) : i) + 3 * 3]] = grid[5 * 9 + p[(eje - 1) * 12 + i + 3 * 2]];
 		}
 
 		// Paso 3: Actualizar '5'.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			// [5 <- C1].
 			grid[5 * 9 + p[(eje - 1) * 12 + ((eje == 3 || eje == 4) ? (2 - i) : i) + 3 * 2]] = grid[c1 * 9 + p[(eje - 1) * 12 + i + 3 * 1]];
 		}
 
 		// Paso 4: Actualizar 'C1'.
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			// [C1 <- 0].
 			grid[c1 * 9 + p[(eje - 1) * 12 + i + 3 * 1]] = grid[p[(eje - 1) * 12 + i + 3 * 0]];
 		}
 
 		// Paso 5: Usar 'aux' para actualizar la cara inicial (0).
-		for (int i = 0; i < 3; i++) {
+		for (byte i = 0; i < 3; i++) {
 			// [0 <- aux].
 			grid[p[(eje - 1) * 12 + i + 3 * 0]] = aux[((eje == 1 || eje == 2) ? (2 - i) : i)];
 		}
@@ -212,14 +212,14 @@ void giro_antihorario(int* grid, int* p, int eje) {
 	// Parte B: Rotación de la cara seleccionada.
 
 	// Respaldar los valores originales de la cara a rotar en un array temporal.
-	int temp[9];
-	for (int i = 0; i < 9; i++) {
+	byte temp[9];
+	for (byte i = 0; i < 9; i++) {
 		temp[i] = grid[eje * 9 + i];
 	}
 
 	// Aplicar la rotación A[i][j] -> A[2-j][i].
-	for (int j = 0; j < 3; j++) {
-		for (int i = 0; i < 3; i++) {
+	for (byte j = 0; j < 3; j++) {
+		for (byte i = 0; i < 3; i++) {
 			grid[eje * 9 + (2 - j) * 3 + i] = temp[i * 3 + j];
 		}
 	}
@@ -231,7 +231,7 @@ void giro_antihorario(int* grid, int* p, int eje) {
 
 
 
-void hilera_superior_cara_lateral(int* grid, int* pos, int c){
+void hilera_superior_cara_lateral(byte* grid, byte* pos, byte c){
 	// Detectar si hay una arista roja en la hilera superior de la cara 'c'.
 	if( grid[c*9 + 1] == 0 ){
 		// En caso de haber, asegura que un giro horario sobre la cara no retire una arista roja de la cara Naranja (5).
@@ -247,7 +247,7 @@ void hilera_superior_cara_lateral(int* grid, int* pos, int c){
 		giro_antihorario(grid, pos, c%4+1);
 		// Comprobar que regresar la cara actual a su estado original no retirará una arista roja.
 		if( grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
-			int rec = 0;
+			byte rec = 0;
 			while( grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
 				// 'rec' se utiliza para detener el ciclo 'while' en caso de que se detecten todas las aristas rojas en la cara Naranja.
 				// Para la comprobación, un máximo de tres giros es suficiente.
@@ -267,9 +267,9 @@ void hilera_superior_cara_lateral(int* grid, int* pos, int c){
 
 
 
-void lado_izquierdo_cara_lateral(int* grid, int* pos, int c){
+void lado_izquierdo_cara_lateral(byte* grid, byte* pos, byte c){
 	// K: Cara lateral anterior.
-	int K = (c+2) % 4 + 1;
+	byte K = (c+2) % 4 + 1;
 	// Detectar si hay una arista roja en el lado izquierdo de la cara 'c'.
 	if( grid[c*9 + 3] == 0 ){
 		// En caso de haber, comprobar que un giro horario en la cara anterior (K) no retire una arista roja de la cara Naranja (5).
@@ -303,9 +303,9 @@ void lado_izquierdo_cara_lateral(int* grid, int* pos, int c){
 
 
 
-void lado_derecho_cara_lateral(int* grid, int* pos, int c){
+void lado_derecho_cara_lateral(byte* grid, byte* pos, byte c){
 	// F: Cara lateral siguiente.
-	int F = c % 4 + 1;
+	byte F = c % 4 + 1;
 	// Detectar si hay una arista roja al lado derecho de la cara 'c'.
 	if( grid[c*9 + 5] == 0 ){
 		// En caso de haber, comprobar que un giro antihorario en la cara siguiente (F) no retire una arista roja de la cara Naranja (5).
@@ -327,11 +327,11 @@ void lado_derecho_cara_lateral(int* grid, int* pos, int c){
 
 
 
-void esquinas_rojas_cara_naranja(int* grid, int* pos){
-	int c;
+void esquinas_rojas_cara_naranja(byte* grid, byte* pos){
+	byte c;
 	bool rec;
 	// Recorrer las esquinas de la cara naranja.
-	for(int i=1; i<5; i++){
+	for(byte i=1; i<5; i++){
 		// En caso de encontrar una esquina roja, busca alinearla en la cara lateral correcta.
 		if( grid[ 5*9 + 2*i + ((i<3) ? -2 : 0) ] == 0 ){
 			rec = false;
@@ -360,7 +360,7 @@ void esquinas_rojas_cara_naranja(int* grid, int* pos){
 
 
 
-void subir_esquina_izquierda(int* grid, int* pos, int c){
+void subir_esquina_izquierda(byte* grid, byte* pos, byte c){
 	giro_horario(grid, pos, 5);
 	giro_horario(grid, pos, (c+2)%4+1);
 	giro_antihorario(grid, pos, 5);
@@ -369,7 +369,7 @@ void subir_esquina_izquierda(int* grid, int* pos, int c){
 
 
 
-void subir_esquina_derecha(int* grid, int* pos, int c){
+void subir_esquina_derecha(byte* grid, byte* pos, byte c){
 	giro_antihorario(grid, pos, 5);
 	giro_antihorario(grid, pos, c%4+1);
 	giro_horario(grid, pos, 5);
@@ -379,7 +379,7 @@ void subir_esquina_derecha(int* grid, int* pos, int c){
 
 
 
-void selec_giro(int* grid, int* pos, int c, bool state){
+void selec_giro(byte* grid, byte* pos, byte c, bool state){
 	if(state == true){
 		giro_horario(grid, pos, c);
 	} else{
@@ -389,8 +389,8 @@ void selec_giro(int* grid, int* pos, int c, bool state){
 
 
 
-void esquina_roja_hilera_inferior_izquierda(int* grid, int* pos, int c){
-	int K = c;
+void esquina_roja_hilera_inferior_izquierda(byte* grid, byte* pos, byte c){
+	byte K = c;
 	bool find;
 	// Detectar si la esquina inferior izquierda de la cara 'c' es roja.
 	if( grid[c*9 + 6] == 0 ){
@@ -411,8 +411,8 @@ void esquina_roja_hilera_inferior_izquierda(int* grid, int* pos, int c){
 
 
 
-void esquina_roja_hilera_inferior_derecha(int* grid, int* pos, int c){
-	int F = c;
+void esquina_roja_hilera_inferior_derecha(byte* grid, byte* pos, byte c){
+	byte F = c;
 	bool find;
 	// Detectar si la esquina inferior izquierda de la cara 'c' es roja.
 	if( grid[c*9 + 8] == 0 ){
@@ -433,13 +433,13 @@ void esquina_roja_hilera_inferior_derecha(int* grid, int* pos, int c){
 
 
 
-void revision_superior(int* grid, int* pos){
-	int R;
+void revision_superior(byte* grid, byte* pos){
+	byte R;
 	bool find;
 	// Recorrer las diagonales de la cara Roja (0).
 	do{
 		find = false;
-		for(int i=1; i<5; i++){
+		for(byte i=1; i<5; i++){
 			R = (i < 3) ? 3-i : i;
 			// Detectar esquinas rojas en la cara Roja, pero en su posición incorrecta.
 			if( grid[ 2*i + ((i<3) ? -2 : 0) ] == 0 && grid[R*9 + 2] != R ){
@@ -450,7 +450,7 @@ void revision_superior(int* grid, int* pos){
 			}
 		}
 		// Verificar si es necesario volver a hacer el ciclo.
-		for(int i=1; i<5; i++){
+		for(byte i=1; i<5; i++){
 			R = (i<3) ? 3-i : i;
 			// Detectar esquinas rojas en la cara Roja, pero en su posición incorrecta.
 			if( grid[ 2*i + ((i<3) ? -2 : 0) ] == 0 && grid[R*9 + 2] != R ){
@@ -464,20 +464,20 @@ void revision_superior(int* grid, int* pos){
 
 
 
-void giro_aleatorio(int* grid, int* pos){
-  	int c = random(0,6);
+void giro_aleatorio(byte* grid, byte* pos){
+  	byte c = random(0,6);
   	bool f = random(0,2);
 	selec_giro(grid, pos, c, f);
 }
 
 
 
-void cruz_roja(int* grid, int* pos){
+void cruz_roja(byte* grid, byte* pos){
 	bool find;
 	// Paso 1: Buscar aristas rojas en la cara Roja (0).
 	Serial.println("Paso 1. Buscar aristas rojas en la cara Roja.");
 	// En caso de encontrar una arista roja en la cara Roja (0), la envía a la cara Naranja (5).
-	for(int i=0; i<4; i++){
+	for(byte i=0; i<4; i++){
 		if( grid[2*i + 1] == 0 ){
 			// Comprobar que el envío no reemplace a otra arista roja en la cara Naranja (5).
 			while( grid[ 5*9 + ((i<2) ? 4*i+1 : 4*i-5) ] == 0 ){
@@ -494,11 +494,11 @@ void cruz_roja(int* grid, int* pos){
 	Serial.println("Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral.");
 	do{
 		find = false;
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			hilera_superior_cara_lateral(grid, pos, c);
 		}
 		// Verificación.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 1] == 0 ){
 				Serial.println("¡Repetir Paso A.2!");
 				find = true;
@@ -513,11 +513,11 @@ void cruz_roja(int* grid, int* pos){
 	Serial.println("Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral.");
 	do{
 		find = false;
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			lado_izquierdo_cara_lateral(grid, pos, c);
 		}
 		// Verificación.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 3] == 0 ){
 				Serial.println("¡Repetir Paso A.3!");
 				find = true;
@@ -532,11 +532,11 @@ void cruz_roja(int* grid, int* pos){
 	Serial.println("Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral.");
 	do{
 		find = false;
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			lado_derecho_cara_lateral(grid, pos, c);
 		}
 		// Verificación.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 5] == 0 ){
 				Serial.println("¡Repetir Paso A.4!");
 				find = true;
@@ -550,7 +550,7 @@ void cruz_roja(int* grid, int* pos){
 	Serial.println("Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral.");
 	do{
 		find = false;
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Detectar si hay una arista roja en la hilera inferior de la cara 'c'.
 			if( grid[c*9 + 7] == 0 ){
 				// Algoritmo para colocar la arista roja en la cara Naranja (5) aprovechando el espacio generado por la arista encontrada.
@@ -562,7 +562,7 @@ void cruz_roja(int* grid, int* pos){
 			}
 		}
 		// Verificación.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 7] == 0 ){
 				Serial.println("¡Repetir Paso A.5!");
 				find = true;
@@ -575,10 +575,10 @@ void cruz_roja(int* grid, int* pos){
 
 
 
-void verify(int* grid, int* pos, int A){
+void verify(byte* grid, byte* pos, byte A){
 	// Verificación de la posición de las piezas rojas.
-	for(int c=0; c<6; c++){
-		for(int i=0; i<9; i++){
+	for(byte c=0; c<6; c++){
+		for(byte i=0; i<9; i++){
 			if( grid[c*9 + i] == A ){
 				Serial.print("Color ");
 				Serial.print(A);
@@ -593,7 +593,7 @@ void verify(int* grid, int* pos, int A){
 
 
 
-void esquinas_cara_roja(int* grid, int* pos){
+void esquinas_cara_roja(byte* grid, byte* pos){
 	bool find;
 	// Paso 1: Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.
 	Serial.println("Paso 1. Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.");
@@ -605,7 +605,7 @@ void esquinas_cara_roja(int* grid, int* pos){
 		find = false;
 		esquinas_rojas_cara_naranja(grid, pos);
 		// Verificación.
-		for(int i=1; i<5; i++){
+		for(byte i=1; i<5; i++){
 			if( grid[ 5*9 + 2*i + ((i<3) ? -2 : 0) ] == 0 ){
 				Serial.println("¡Repetir Paso B.2!");
 				find = true;
@@ -620,13 +620,13 @@ void esquinas_cara_roja(int* grid, int* pos){
 	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 6] == 0', se repetirá la ejecución del bloque.
 	do{
 		find = false;
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Detectar si la esquina inferior izquierda de la cara 'c' es roja.
 			esquina_roja_hilera_inferior_izquierda(grid, pos, c);
 		}
 
 		// Comprobar si existe algún otro valor 'c' que satisfaga 'grid[c*9 + 6] == 0'. En dado caso, se repetirá el código.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Detectar si la esquina inferior de la cara 'c' es roja.
 			if( grid[c*9 + 6] == 0 ){
 				Serial.println("¡Repetir Paso B.3!");
@@ -642,13 +642,13 @@ void esquinas_cara_roja(int* grid, int* pos){
 	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 8] == 0', se repetirá la ejecución del bloque.
 	do{
 		find = false;
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Detectar si la esquina inferior derecha de la cara 'c' es roja.
 			esquina_roja_hilera_inferior_derecha(grid, pos, c);
 		}
 
 		// Comprobar si existe algún otro valor 'c' que satisfaga 'grid[c*9 + 8] == 0'. En dado caso, se repetirá el código.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Detectar si la esquina inferior de la cara 'c' es roja.
 			if( grid[c*9 + 8] == 0 ){
 				Serial.println("Repetir Paso B.5");
@@ -663,11 +663,11 @@ void esquinas_cara_roja(int* grid, int* pos){
 	Serial.println("Paso 5: Buscar esquinas rojas en la hilera superior de las caras laterales.");
 	do{
 		find = false;
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Esquina superior izquierda.
 			if( grid[c*9] == 0 ){
 				// K: Cara lateral anterior.
-				int K = (c+2) % 4 + 1;
+				byte K = (c+2) % 4 + 1;
 				// Caso #1: Esquina en posición correcta, pero orientación incorrecta.
 				if( grid[ ((c<3) ? 14-6*c : 6*c-18) ] == K ){
 					giro_horario(grid, pos, K);
@@ -690,7 +690,7 @@ void esquinas_cara_roja(int* grid, int* pos){
 			// Esquina superior derecha.
 			if( grid[c*9 + 2] == 0 ){
 				// F: Cara lateral siguiente.
-				int F = c % 4 + 1;
+				byte F = c % 4 + 1;
 				// Caso #1: Esquina en posición correcta, pero orientación incorrecta.
 				if( grid[ ((c<3) ? 4-2*c : 3*c) ] == F ){
 					giro_antihorario(grid, pos, F);
@@ -713,7 +713,7 @@ void esquinas_cara_roja(int* grid, int* pos){
 		}
 
 		// Verificar si es necesario repetir el bloque de código.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			if( grid[c*9] == 0 || grid[c*9 + 2] == 0){
 				Serial.println("Repetir Paso B.5");
 				find = true;
@@ -726,10 +726,10 @@ void esquinas_cara_roja(int* grid, int* pos){
 
 
 
-void colocar_arista_inferior(int* grid, int* pos, int c){
+void colocar_arista_inferior(byte* grid, byte* pos, byte c){
 	// F: Cara lateral siguiente; K: Cara lateral anterior.
-	int F = c % 4 + 1;
-	int K = (c+2) % 4 + 1;
+	byte F = c % 4 + 1;
+	byte K = (c+2) % 4 + 1;
 	// Variable auxiliar para condensar el código.
 	bool state = grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == F;
 	// Caso #1 (state): El lado de la arista en la cara Naranja (5) es del color de la cara lateral siguiente (F).
@@ -746,12 +746,12 @@ void colocar_arista_inferior(int* grid, int* pos, int c){
 
 
 
-void mover_naranja(int* grid, int* pos, int c, int N){
+void mover_naranja(byte* grid, byte* pos, byte c, byte N){
 	// K: Cara lateral anterior.
-	int K = (c+2) % 4 + 1;
+	byte K = (c+2) % 4 + 1;
 	giro_horario(grid, pos, c);
 	// Repetir el movimiento 'N' veces.
-	for(int i=0; i < N; i++){
+	for(byte i=0; i < N; i++){
 		giro_horario(grid, pos, K);
 		giro_horario(grid, pos, 5);
 		giro_antihorario(grid, pos, K);
@@ -762,7 +762,7 @@ void mover_naranja(int* grid, int* pos, int c, int N){
 
 
 // Función a emplear durante la alineación de aristas de la última cara.
-void permutar_aristas(int* grid, int* pos, int c){
+void permutar_aristas(byte* grid, byte* pos, byte c){
 	giro_antihorario(grid, pos, c);
 	giro_antihorario(grid, pos, 5);
 	giro_horario(grid, pos, c);
@@ -776,11 +776,11 @@ void permutar_aristas(int* grid, int* pos, int c){
 
 
 
-bool revisar_posicion(int* grid, int* pos, int c){
-	int count;
-	int F = c % 4 + 1;
+bool revisar_posicion(byte* grid, byte* pos, byte c){
+	byte count;
+	byte F = c % 4 + 1;
 	// Revisar con base en la esquina inferior derecha de cada cara lateral.
-	for(int c=1; c<5; c++){
+	for(byte c=1; c<5; c++){
 		// Verificar si la esquina tiene el color de la cara actual.
 		if( grid[c*9 + 8] == c || grid[F*9 + 6] == c || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == c ){
 			count++;
@@ -800,9 +800,9 @@ bool revisar_posicion(int* grid, int* pos, int c){
 
 
 
-void permutar_esquinas(int* grid, int* pos, int c){
-	int F = c % 4 + 1;
-	int K = (c+2) % 4 + 1;
+void permutar_esquinas(byte* grid, byte* pos, byte c){
+	byte F = c % 4 + 1;
+	byte K = (c+2) % 4 + 1;
 	giro_antihorario(grid, pos, 5);
 	giro_antihorario(grid, pos, F);
 	giro_horario(grid, pos, 5);
@@ -815,8 +815,8 @@ void permutar_esquinas(int* grid, int* pos, int c){
 
 
 
-void girar_esquinas(int* grid, int* pos){
-	for(int c=1; c<5; c++){
+void girar_esquinas(byte* grid, byte* pos){
+	for(byte c=1; c<5; c++){
 		// Primera posible rotación.
 		if( grid[1*9 + 6] != c){
 			giro_antihorario(grid, pos, 4);
@@ -847,11 +847,11 @@ void girar_esquinas(int* grid, int* pos){
 
 
 // Función para resolver el cubo.
-void solve(int* grid, int* pos){
+void solve(byte* grid, byte* pos){
 	
 // Parte A: Colocar la cruz roja.
 	bool find;
-	int count, R, F, N;
+	byte count, R, F, N;
   	Serial.println("Parte A. Cruz roja.");
 	cruz_roja(grid, pos);
 
@@ -860,7 +860,7 @@ void solve(int* grid, int* pos){
 		find = true;
 		count = 0;
 		// Contar el número de aristas rojas en la cara Naranja (5).
-		for(int i = 0; i<4; i++){
+		for(byte i = 0; i<4; i++){
 			if( grid[5*9 + 1 + 2*i] == 0 ){
 				count++;
 			}
@@ -878,12 +878,12 @@ void solve(int* grid, int* pos){
 
 	// Paso 6: Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).
 	Serial.println("Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).");
-	int rep = 0;
+	byte rep = 0;
 	count = 0;
 	// Iterar hasta haber desplazado 4 aristas.
 	while(rep < 4){
 		// Explorar las caras laterales.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Buscar aristas en la hilera inferior que coincidan con el color del centro de la cara.
 			if( grid[c*9 + 7] == c && grid[ 5*9 + ((c<3) ? 5-2*c : 2*c-1) ] == 0 ){
 				giro_horario(grid, pos, c);
@@ -905,8 +905,8 @@ void solve(int* grid, int* pos){
 	do{
 		find = false;
 		esquinas_cara_roja(grid, pos);
-		// Verificar si alguna esquina de la cara roja es de un color distinto.
-		for(int i=1; i<5; i++){
+		// Verificar si alguna esquina de la cara roja es de un color diferente.
+		for(byte i=1; i<5; i++){
 			if( grid[ 2*i + ((i<3) ? -2 : 0) ] != 0 ){
 				// En caso de encontrar una esquina errónea, repite el proceso 'esquinas_cara_roja'.
 				Serial.println("Repetir proceso esquinas_cara_roja");
@@ -920,14 +920,14 @@ void solve(int* grid, int* pos){
 	verify(grid, pos, 0);
 	
 
-// Parte C: Aristas intermedias.
-	Serial.println("Parte C: Aristas intermedias.");
+// Parte C: Aristas del medio.
+	Serial.println("Parte C: Aristas del medio.");
 	Serial.println("Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral.");
 	// Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral.
 	bool check;
 	do{
 		find = false;
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Revisar ambos costados de la arista ubicada en la hilera inferior de la cara 'c'.
 			if( grid[c*9 + 7] != 5 && grid[5*9 + ((c<3) ? 5-2*c : 2*c-1) ] != 5 ){
 				// R: Variable auxiliar.
@@ -950,7 +950,7 @@ void solve(int* grid, int* pos){
 		}
 
 		// Verificación.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Repetir el bloque de código en caso de encontrar una arista restante.
 			if( grid[c*9 + 7] != 5 && grid[5*9 + ((c<3) ? 5-2*c : 2*c-1) ] != 5 ){
 				Serial.println("Repetir Paso C.1");
@@ -959,12 +959,12 @@ void solve(int* grid, int* pos){
 			}
 		}
 	} while(find);
-	Serial.println("Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.");
-	// Paso 2: Buscar aristas intermedias en la posición correcta, pero con orientación incorrecta.
+	Serial.println("Paso 2: Buscar aristas del medio en la posición correcta, pero con orientación incorrecta.");
+	// Paso 2: Buscar aristas del medio en la posición correcta, pero con orientación incorrecta.
 	do{
 		find = false;
-		int F;
-		for(int c=1; c<5; c++){
+		byte F;
+		for(byte c=1; c<5; c++){
 			// Detectar si la arista derecha es del color de la cara lateral siguiente.
 			if( grid[c*9 + 5] == c%4+1 && grid[(c%4+1)*9 + 3] == c ){
 				// F: Cara lateral siguiente.
@@ -990,7 +990,7 @@ void solve(int* grid, int* pos){
 		}
 
 		// Verificación.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 5] == c%4+1 && grid[(c%4+1)*9 + 3] == c ){
 				Serial.println("Repetir Paso C.2");
 				find = true;
@@ -1005,7 +1005,7 @@ void solve(int* grid, int* pos){
 	// Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja (5).
 	count = 0;
 	// Contar el número de aristas naranjas en la cara Naranja (5).
-	for(int i=0; i<4; i++){
+	for(byte i=0; i<4; i++){
 		if( grid[5*9 + 2*i + 1] == 5 ){
 			count++;
 		}
@@ -1034,10 +1034,10 @@ void solve(int* grid, int* pos){
 	// Contar la cantidad de aristas alineadas.
 	count = 0;
 	// Probar las cuatro orientaciones posibles de la cara naranja hasta encontrar dos o cuatro aristas alineadas.
-	for(int N=0; N < 4; N++){
+	for(byte N=0; N < 4; N++){
 		// Revisar las cuatro caras laterales, contando el número de aristas alineadas.
 		// Si el número de aristas es menor a 2, se continúa iterando. En caso de ser 2 o 4, se ejecutan los casos posibles.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 7] == c ){
 				count++;
 			}
@@ -1056,7 +1056,7 @@ void solve(int* grid, int* pos){
 					goto loops_exit;
 				// Caso #3: Dos aristas alineadas contiguas.
 				} else{
-					int i;
+					byte i;
 					i = 1;
 					do{
 						F = i % 4 + 1;
@@ -1085,7 +1085,7 @@ void solve(int* grid, int* pos){
 	count = 0;
 	while(true){
 		// Revisar cuántas esquinas están en su posición correcta.
-		for(int c=1; c<5; c++){
+		for(byte c=1; c<5; c++){
 			// Cada vez que encuentre una esquina en posición, suma al contador.
 			if( revisar_posicion(grid, pos, c) == true ){
 				// En caso de ser la primera esquina en posición encontrada, reservarla.
@@ -1114,7 +1114,7 @@ void solve(int* grid, int* pos){
 	girar_esquinas(grid, pos);
 
 	Serial.println("¡Cubo resuelto!");
-	for(int c=0; c<6; c++){
+	for(byte c=0; c<6; c++){
 		verify(grid, pos, c);
 	}
 	
@@ -1140,16 +1140,16 @@ void setup() {
     Serial.begin(9600);
   
     // Generar cubo rubik.
-    static int grid[9*6];
+    static byte grid[9*6];
     // Rellenar colores: Rojo (0) - Azul (1) - Blanco (2) - Verde (3) - Amarillo (4) - Naranja (5).
-    for (int c = 0; c < 6; c++) {
-        for (int i = 0; i < 9; i++) {
+    for (byte c = 0; c < 6; c++) {
+        for (byte i = 0; i < 9; i++) {
             grid[c * 9 + i] = c;
         }
     }
 
     // Lista de posiciones relativas para un giro horario <0,C1,5,C2>.
-    static int pos[12 * 4]{
+    static byte pos[12 * 4]{
     	2, 5, 8,  2, 5, 8,  6, 3, 0,  0, 3, 6,  // eje == 1 (fila 0).
 	0, 1, 2,  2, 5, 8,  0, 1, 2,  6, 3, 0,  // eje == 2 (fila 1).
 	0, 3, 6,  8, 5, 2,  2, 5, 8,  6, 3, 0,  // eje == 3 (fila 2).

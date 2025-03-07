@@ -138,9 +138,9 @@ void giro_horario(byte* grid,  byte* p, byte eje) {
 		}
 	}
     
-  	Serial.print("Giro horario. Cara ");
+  	Serial.print(F("Giro horario. Cara "));
   	Serial.print(eje);
-  	Serial.println(".");
+  	Serial.println(F("."));
   
 }
 
@@ -224,9 +224,9 @@ void giro_antihorario(byte* grid, byte* p, byte eje) {
 		}
 	}
 
-	Serial.print("Giro antihorario. Cara ");
+	Serial.print(F("Giro antihorario. Cara "));
 	Serial.print(eje);
-	Serial.println(".");
+	Serial.println(F("."));
 }
 
 
@@ -475,7 +475,7 @@ void giro_aleatorio(byte* grid, byte* pos){
 void cruz_roja(byte* grid, byte* pos){
 	bool find;
 	// Paso 1: Buscar aristas rojas en la cara Roja (0).
-	Serial.println("Paso 1. Buscar aristas rojas en la cara Roja.");
+	Serial.println(F("Paso 1. Buscar aristas rojas en la cara Roja."));
 	// En caso de encontrar una arista roja en la cara Roja (0), la envía a la cara Naranja (5).
 	for(byte i=0; i<4; i++){
 		if( grid[2*i + 1] == 0 ){
@@ -491,7 +491,7 @@ void cruz_roja(byte* grid, byte* pos){
 	}
 	
 	// Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral (1-4).
-	Serial.println("Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral.");
+	Serial.println(F("Paso 2: Buscar aristas rojas en la hilera superior de cada cara lateral."));
 	do{
 		find = false;
 		for(byte c=1; c<5; c++){
@@ -500,7 +500,7 @@ void cruz_roja(byte* grid, byte* pos){
 		// Verificación.
 		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 1] == 0 ){
-				Serial.println("¡Repetir Paso A.2!");
+				Serial.println(F("¡Repetir Paso A.2!"));
 				find = true;
 				break;
 			}
@@ -510,7 +510,7 @@ void cruz_roja(byte* grid, byte* pos){
 	
 
 	// Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral (1-4).
-	Serial.println("Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral.");
+	Serial.println(F("Paso 3: Buscar aristas rojas en el lado izquierdo de cada cara lateral."));
 	do{
 		find = false;
 		for(byte c=1; c<5; c++){
@@ -519,7 +519,7 @@ void cruz_roja(byte* grid, byte* pos){
 		// Verificación.
 		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 3] == 0 ){
-				Serial.println("¡Repetir Paso A.3!");
+				Serial.println(F("¡Repetir Paso A.3!"));
 				find = true;
 				break;
 			}
@@ -529,7 +529,7 @@ void cruz_roja(byte* grid, byte* pos){
 	
 
 	// Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral (1-4).
-	Serial.println("Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral.");
+	Serial.println(F("Paso 4: Buscar aristas rojas en el lado derecho de cada cara lateral."));
 	do{
 		find = false;
 		for(byte c=1; c<5; c++){
@@ -538,7 +538,7 @@ void cruz_roja(byte* grid, byte* pos){
 		// Verificación.
 		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 5] == 0 ){
-				Serial.println("¡Repetir Paso A.4!");
+				Serial.println(F("¡Repetir Paso A.4!"));
 				find = true;
 				break;
 			}
@@ -547,7 +547,7 @@ void cruz_roja(byte* grid, byte* pos){
 	} while(find);
 
 	// Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral (1-4).
-	Serial.println("Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral.");
+	Serial.println(F("Paso 5: Buscar aristas rojas en la hilera inferior de cada cara lateral."));
 	do{
 		find = false;
 		for(byte c=1; c<5; c++){
@@ -564,7 +564,7 @@ void cruz_roja(byte* grid, byte* pos){
 		// Verificación.
 		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 7] == 0 ){
-				Serial.println("¡Repetir Paso A.5!");
+				Serial.println(F("¡Repetir Paso A.5!"));
 				find = true;
 				break;
 			}
@@ -580,11 +580,11 @@ void verify(byte* grid, byte* pos, byte A){
 	for(byte c=0; c<6; c++){
 		for(byte i=0; i<9; i++){
 			if( grid[c*9 + i] == A ){
-				Serial.print("Color ");
+				Serial.print(F("Color "));
 				Serial.print(A);
-				Serial.print(" en cara ");
+				Serial.print(F(" en cara "));
 				Serial.print(c);
-				Serial.print(", pos ");
+				Serial.print(F(", pos "));
 				Serial.println(i);
 			}
 		}
@@ -596,18 +596,18 @@ void verify(byte* grid, byte* pos, byte A){
 void esquinas_cara_roja(byte* grid, byte* pos){
 	bool find;
 	// Paso 1: Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.
-	Serial.println("Paso 1. Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta.");
+	Serial.println(F("Paso 1. Revisar en las hileras superiores de las caras laterales si existen esquinas rojas en la orientación correcta, pero posición incorrecta."));
 	revision_superior(grid, pos);
 	
 	// Paso 2: Buscar esquinas rojas en la cara Naranja (5).
-	Serial.println("Paso 2: Buscar esquinas rojas en la cara Naranja.");
+	Serial.println(F("Paso 2: Buscar esquinas rojas en la cara Naranja."));
 	do{
 		find = false;
 		esquinas_rojas_cara_naranja(grid, pos);
 		// Verificación.
 		for(byte i=1; i<5; i++){
 			if( grid[ 5*9 + 2*i + ((i<3) ? -2 : 0) ] == 0 ){
-				Serial.println("¡Repetir Paso B.2!");
+				Serial.println(F("¡Repetir Paso B.2!"));
 				find = true;
 				break;
 			}
@@ -616,7 +616,7 @@ void esquinas_cara_roja(byte* grid, byte* pos){
 	} while(false);
 
 	// Paso 3: Buscar 'rojo' (0) en la esquina inferior izquierda de cada cara lateral.
-	Serial.println("Paso 3: Buscar 'rojo' en la esquina inferior izquierda de cada cara lateral.");
+	Serial.println(F("Paso 3: Buscar 'rojo' en la esquina inferior izquierda de cada cara lateral."));
 	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 6] == 0', se repetirá la ejecución del bloque.
 	do{
 		find = false;
@@ -629,7 +629,7 @@ void esquinas_cara_roja(byte* grid, byte* pos){
 		for(byte c=1; c<5; c++){
 			// Detectar si la esquina inferior de la cara 'c' es roja.
 			if( grid[c*9 + 6] == 0 ){
-				Serial.println("¡Repetir Paso B.3!");
+				Serial.println(F("¡Repetir Paso B.3!"));
 				find = true;
 				break;
 			}
@@ -638,7 +638,7 @@ void esquinas_cara_roja(byte* grid, byte* pos){
 	} while(find);
 
 	// Paso 4: Buscar 'rojo' (0) en la esquina inferior derecha de cada cara lateral.
-	Serial.println("Paso 4: Buscar 'rojo' en la esquina inferior derecha de cada cara lateral.");
+	Serial.println(F("Paso 4: Buscar 'rojo' en la esquina inferior derecha de cada cara lateral."));
 	// Si al final del bloque 'do' se encuentra un 'c' tal que se cumpla la condición 'grid[c*9 + 8] == 0', se repetirá la ejecución del bloque.
 	do{
 		find = false;
@@ -651,7 +651,7 @@ void esquinas_cara_roja(byte* grid, byte* pos){
 		for(byte c=1; c<5; c++){
 			// Detectar si la esquina inferior de la cara 'c' es roja.
 			if( grid[c*9 + 8] == 0 ){
-				Serial.println("Repetir Paso B.5");
+				Serial.println(F("Repetir Paso B.5"));
 				find = true;
 				break;
 			}
@@ -660,7 +660,7 @@ void esquinas_cara_roja(byte* grid, byte* pos){
 	} while(find);
 
 	// Paso 5: Buscar esquinas rojas en la hilera superior de las caras laterales.
-	Serial.println("Paso 5: Buscar esquinas rojas en la hilera superior de las caras laterales.");
+	Serial.println(F("Paso 5: Buscar esquinas rojas en la hilera superior de las caras laterales."));
 	do{
 		find = false;
 		for(byte c=1; c<5; c++){
@@ -715,7 +715,7 @@ void esquinas_cara_roja(byte* grid, byte* pos){
 		// Verificar si es necesario repetir el bloque de código.
 		for(byte c=1; c<5; c++){
 			if( grid[c*9] == 0 || grid[c*9 + 2] == 0){
-				Serial.println("Repetir Paso B.5");
+				Serial.println(F("Repetir Paso B.5"));
 				find = true;
 				break;
 			}
@@ -852,7 +852,7 @@ void solve(byte* grid, byte* pos){
 // Parte A: Colocar la cruz roja.
 	bool find;
 	byte count, R, F, N;
-  	Serial.println("Parte A. Cruz roja.");
+  	Serial.println(F("Parte A. Cruz roja."));
 	cruz_roja(grid, pos);
 
 	// Contención de errores: Si no se encuentran 4 aristas rojas en la cara Naranja (5), se repite el proceso 'cruz_roja'.
@@ -871,13 +871,13 @@ void solve(byte* grid, byte* pos){
 			break;
 		}
 		// Caso contrario, se repite el proceso 'cruz_roja'.
-		Serial.println("Repetir el proceso cruz_roja");
+		Serial.println(F("Repetir el proceso cruz_roja"));
 		cruz_roja(grid, pos);
 	// En caso de 'find == true', se ejecutará nuevamente el código.	
 	} while(find);
 
 	// Paso 6: Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).
-	Serial.println("Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0).");
+	Serial.println(F("Paso 6: Mover las aristas rojas de la cara Naranja (5) a la cara Roja (0)."));
 	byte rep = 0;
 	count = 0;
 	// Iterar hasta haber desplazado 4 aristas.
@@ -891,7 +891,7 @@ void solve(byte* grid, byte* pos){
 				rep++;
 				count++;
 				if(count > 12){
-					Serial.println("Error en Paso A.6");
+					Serial.println(F("Error en Paso A.6"));
 					break;
 				}
 			}
@@ -901,7 +901,7 @@ void solve(byte* grid, byte* pos){
 	}
 
 // Parte B: Esquinas de la cara Roja (0).
-	Serial.println("Parte B: Esquinas de la cara Roja.");
+	Serial.println(F("Parte B: Esquinas de la cara Roja."));
 	do{
 		find = false;
 		esquinas_cara_roja(grid, pos);
@@ -909,7 +909,7 @@ void solve(byte* grid, byte* pos){
 		for(byte i=1; i<5; i++){
 			if( grid[ 2*i + ((i<3) ? -2 : 0) ] != 0 ){
 				// En caso de encontrar una esquina errónea, repite el proceso 'esquinas_cara_roja'.
-				Serial.println("Repetir proceso esquinas_cara_roja");
+				Serial.println(F("Repetir proceso esquinas_cara_roja"));
 				find = true;
 				break;
 			}
@@ -921,8 +921,8 @@ void solve(byte* grid, byte* pos){
 	
 
 // Parte C: Aristas del medio.
-	Serial.println("Parte C: Aristas del medio.");
-	Serial.println("Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral.");
+	Serial.println(F("Parte C: Aristas del medio."));
+	Serial.println(F("Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral."));
 	// Paso 1: Buscar aristas sin color naranja (5) en la hilera inferior de cada cara lateral.
 	bool check;
 	do{
@@ -953,13 +953,13 @@ void solve(byte* grid, byte* pos){
 		for(byte c=1; c<5; c++){
 			// Repetir el bloque de código en caso de encontrar una arista restante.
 			if( grid[c*9 + 7] != 5 && grid[5*9 + ((c<3) ? 5-2*c : 2*c-1) ] != 5 ){
-				Serial.println("Repetir Paso C.1");
+				Serial.println(F("Repetir Paso C.1"));
 				find = true;
 				break;
 			}
 		}
 	} while(find);
-	Serial.println("Paso 2: Buscar aristas del medio en la posición correcta, pero con orientación incorrecta.");
+	Serial.println(F("Paso 2: Buscar aristas del medio en la posición correcta, pero con orientación incorrecta."));
 	// Paso 2: Buscar aristas del medio en la posición correcta, pero con orientación incorrecta.
 	do{
 		find = false;
@@ -992,7 +992,7 @@ void solve(byte* grid, byte* pos){
 		// Verificación.
 		for(byte c=1; c<5; c++){
 			if( grid[c*9 + 5] == c%4+1 && grid[(c%4+1)*9 + 3] == c ){
-				Serial.println("Repetir Paso C.2");
+				Serial.println(F("Repetir Paso C.2"));
 				find = true;
 				break;
 			}
@@ -1000,8 +1000,8 @@ void solve(byte* grid, byte* pos){
 	} while(find);
 
 // Parte D. Cara naranja.
-	Serial.println("Parte D: Cruz naranja.");
-	Serial.println("Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja.");
+	Serial.println(F("Parte D: Cruz naranja."));
+	Serial.println(F("Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja."));
 	// Paso 1: Posibles casos para la orientación de las aristas de la cara Naranja (5).
 	count = 0;
 	// Contar el número de aristas naranjas en la cara Naranja (5).
@@ -1030,7 +1030,7 @@ void solve(byte* grid, byte* pos){
 	}
 
 	// Paso 2: Alinear las aristas naranjas con las caras laterales.
-	Serial.println("Paso 2: Alinear las aristas naranjas con las caras laterales.");
+	Serial.println(F("Paso 2: Alinear las aristas naranjas con las caras laterales."));
 	// Contar la cantidad de aristas alineadas.
 	count = 0;
 	// Probar las cuatro orientaciones posibles de la cara naranja hasta encontrar dos o cuatro aristas alineadas.
@@ -1069,7 +1069,7 @@ void solve(byte* grid, byte* pos){
 						}
 						// Contención de errores.
 						if(i > 4){
-							Serial.println("Error fatal en el Paso D.2");
+							Serial.println(F("Error fatal en el Paso D.2"));
 							goto loops_exit;
 						}
 					} while(true);
@@ -1081,7 +1081,7 @@ void solve(byte* grid, byte* pos){
 	loops_exit:
 
 	// Paso 3: Posición de las esquinas.
-	Serial.println("Paso 3: Orientación de las esquinas.");
+	Serial.println(F("Paso 3: Orientación de las esquinas."));
 	count = 0;
 	while(true){
 		// Revisar cuántas esquinas están en su posición correcta.
@@ -1113,7 +1113,7 @@ void solve(byte* grid, byte* pos){
 	// Paso 4: Orientación de las esquinas.
 	girar_esquinas(grid, pos);
 
-	Serial.println("¡Cubo resuelto!");
+	Serial.println(F("¡Cubo resuelto!"));
 	for(byte c=0; c<6; c++){
 		verify(grid, pos, c);
 	}

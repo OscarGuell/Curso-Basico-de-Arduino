@@ -1035,20 +1035,33 @@ void solve(int* grid, int* pos){
 	// Línea a la que el código para continuar con el siguiente paso.
 	loops_exit;
 
-	// Paso 3: Orientación de las esquinas.
+	// Paso 3: Posición de las esquinas.
 	Serial.println("Paso 3: Orientación de las esquinas.");
-	// Buscar una esquina en su posición y orientación correcta.
+	count = 0;
+	// Revisar cuántas esquinas están en su posición correcta.
 	for(int c=1; c<5; c++){
-		// Revisar desde la esquina inferior izquierda de las caras laterales.
-		if( revisar_posicion(grid, pos, c) ){
-			// Verificar si el resto de esquinas están en sus posiciones correctas.
-			F = c % 4 + 1;
-			//revisar_posicion(grid, pos, F);
-			
+		// Cada vez que encuentre una esquina en posición, suma al contador.
+		if( revisar_esquina(grid, pos, c) == true ){
+			// En caso de ser la primera esquina en posición encontrada, reservarla.
+			if(count == 0){
+				N = c;
+			}
+			count++;
 		}
 	}
+	// Caso #1: Sólo una esquina en posición correcta (sin considerar orientación).
+	if(count == 1){
+		permutar_esquinas(grid, pos, N);
+	// Caso #2: Ninguna esquina en posición correcta.
+	} else if(count == 0){
+		permutar_esquinas(grid, pos, 1);
+	}
+	// Caso #3: Cuatro esquinas en posición (continuar al siguiente paso).
 
 	verify(grid, pos, 0);
+
+	// Paso 4: Orientación de las esquinas.
+	
 }
 
 

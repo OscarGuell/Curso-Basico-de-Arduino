@@ -1087,7 +1087,7 @@ void solve(int* grid, int* pos){
 		// Revisar cuántas esquinas están en su posición correcta.
 		for(int c=1; c<5; c++){
 			// Cada vez que encuentre una esquina en posición, suma al contador.
-			if( revisar_esquina(grid, pos, c) == true ){
+			if( revisar_posicion(grid, pos, c) == true ){
 				// En caso de ser la primera esquina en posición encontrada, reservarla.
 				if(count == 0){
 					N = c;

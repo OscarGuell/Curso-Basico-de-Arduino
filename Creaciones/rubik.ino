@@ -774,7 +774,27 @@ void permutar_aristas(int* grid, int* pos, int c){
 
 
 
-bool revisar_posicion(int* grid, int* pos, int c){}
+bool revisar_posicion(int* grid, int* pos, int c){
+	int count;
+	int F = c % 4 + 1;
+	// Revisar con base en la esquina inferior derecha de cada cara lateral.
+	for(int c=1; c<5; c++){
+		// Verificar si la esquina tiene el color de la cara actual.
+		if( grid[c*9 + 8] == c || grid[F*9 + 6] == c || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == c ){
+			count++:
+		}
+		// Verificar si la esquina tiene el color de la cara siguiente.
+		if( grid[c*9 + 8] == F || grid[F*9 + 6] == F || grid[5*9 + ((c<3) ? 2*c-2 : 14-2*c)] == F ){
+			count++:
+		}
+		// En caso de encontrar ambos colores, sabemos que la esquina está en su posición.
+		if(count == 2){
+			return true;
+		} else{
+			return false;
+		}
+	}
+}
 
 
 
